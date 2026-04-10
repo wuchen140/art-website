@@ -275,7 +275,14 @@
             { name: 'zombie_character.png', category: 'character' }
         ];
 
-        const assets = [...originalAssets, ...exportedAssets];
+        function normalizeAsset(asset) {
+            if (asset.name.toLowerCase().includes('map')) {
+                return { ...asset, category: 'background' };
+            }
+            return asset;
+        }
+
+        const assets = [...originalAssets, ...exportedAssets].map(normalizeAsset);
 
         let currentFilter = 'all';
         let searchTerm = '';
