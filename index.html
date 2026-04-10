@@ -1036,21 +1036,27 @@
             const end = Math.min(start + itemsPerPage, allCards.length);
             const pageCards = allCards.slice(start, end);
 
+            const existingPagination = document.querySelector('.pagination-wrapper');
+            if (existingPagination) {
+                existingPagination.remove();
+            }
+
             gallery.innerHTML = pageCards.map(asset => createCardHTML(asset)).join('');
 
-            const paginationHTML = totalPages > 1 ? `
-                <div class="pagination">
-                    <button class="btn btn-ghost" onclick="goToPage(1)" ${currentPage === 1 ? 'disabled' : ''}>首页</button>
-                    <button class="btn btn-ghost" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>
-                    <span class="page-info">第 ${currentPage} / ${totalPages} 页</span>
-                    <button class="btn btn-ghost" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>
-                    <button class="btn btn-ghost" onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>末页</button>
-                </div>
-            ` : '';
-
-            gallery.insertAdjacentHTML('afterend', `
-                <div class="pagination-wrapper">${paginationHTML}</div>
-            `);
+            if (totalPages > 1) {
+                const paginationHTML = `
+                    <div class="pagination">
+                        <button class="btn btn-ghost" onclick="goToPage(1)" ${currentPage === 1 ? 'disabled' : ''}>首页</button>
+                        <button class="btn btn-ghost" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>
+                        <span class="page-info">第 ${currentPage} / ${totalPages} 页</span>
+                        <button class="btn btn-ghost" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>
+                        <button class="btn btn-ghost" onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>末页</button>
+                    </div>
+                `;
+                gallery.insertAdjacentHTML('afterend', `
+                    <div class="pagination-wrapper">${paginationHTML}</div>
+                `);
+            }
         }
 
         function goToPage(page) {
