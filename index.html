@@ -5,451 +5,1141 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>游戏美术资源</title>
     <style>
+        :root {
+            --bg: #0f1720;
+            --bg-soft: #152231;
+            --panel: rgba(13, 28, 43, 0.84);
+            --panel-strong: rgba(8, 19, 31, 0.92);
+            --panel-border: rgba(147, 197, 253, 0.12);
+            --text: #ecf6ff;
+            --muted: #94a9bd;
+            --accent: #ffb84d;
+            --accent-strong: #ff8f3d;
+            --accent-cool: #67e8f9;
+            --success: #86efac;
+            --shadow: 0 18px 50px rgba(4, 12, 20, 0.45);
+            --radius-xl: 28px;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #1a1a2e;
-            color: #eee;
+            font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
             min-height: 100vh;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(103, 232, 249, 0.18), transparent 28%),
+                radial-gradient(circle at top right, rgba(255, 184, 77, 0.14), transparent 26%),
+                linear-gradient(180deg, #08111b 0%, #0d1723 42%, #101b27 100%);
         }
-        header {
-            background: linear-gradient(135deg, #16213e, #0f3460);
-            padding: 40px 20px;
-            text-align: center;
-            border-bottom: 3px solid #e94560;
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 26px 26px;
+            mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.8), transparent 92%);
         }
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            color: #e94560;
+
+        .page-shell {
+            width: min(1500px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 26px 0 48px;
         }
-        header p {
-            color: #888;
-            font-size: 1.1em;
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 42px;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--panel-border);
+            background:
+                radial-gradient(circle at 18% 18%, rgba(103, 232, 249, 0.18), transparent 22%),
+                radial-gradient(circle at 82% 24%, rgba(255, 184, 77, 0.18), transparent 20%),
+                linear-gradient(135deg, rgba(16, 32, 48, 0.96), rgba(10, 21, 35, 0.92));
+            box-shadow: var(--shadow);
         }
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 20px;
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: auto -10% -40% auto;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 184, 77, 0.24), transparent 65%);
+            filter: blur(12px);
         }
-        .stat {
-            background: rgba(255,255,255,0.1);
-            padding: 10px 20px;
-            border-radius: 8px;
-        }
-        .stat span {
-            color: #e94560;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-        .batch-actions {
-            display: flex;
-            justify-content: center;
+
+        .eyebrow {
+            display: inline-flex;
             align-items: center;
-            gap: 15px;
-            padding: 15px 20px;
-            background: #0f3460;
+            gap: 10px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(103, 232, 249, 0.24);
+            color: var(--accent-cool);
+            background: rgba(103, 232, 249, 0.08);
+            font-size: 0.84rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
-        .batch-actions button {
-            background: #e94560;
-            border: none;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.3s;
+
+        .hero h1 {
+            margin-top: 18px;
+            font-size: clamp(2.4rem, 4vw, 4.5rem);
+            line-height: 0.96;
+            letter-spacing: -0.04em;
         }
-        .batch-actions button:hover {
-            background: #ff6b8a;
+
+        .hero p {
+            margin-top: 16px;
+            max-width: 720px;
+            color: var(--muted);
+            font-size: 1.02rem;
+            line-height: 1.7;
         }
-        .batch-actions button:disabled {
-            background: #666;
-            cursor: not-allowed;
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.9fr);
+            gap: 28px;
+            align-items: end;
         }
-        .batch-actions .select-all-btn {
-            background: transparent;
-            border: 2px solid #e94560;
+
+        .hero-card {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            gap: 14px;
+            padding: 22px;
+            border-radius: var(--radius-lg);
+            background: rgba(9, 21, 33, 0.62);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(12px);
         }
-        .batch-actions .select-all-btn:hover {
-            background: #e94560;
+
+        .hero-card h2 {
+            font-size: 1rem;
+            color: var(--accent);
         }
-        .selected-count {
-            color: #e94560;
-            font-weight: bold;
+
+        .hero-card p {
+            margin-top: 0;
+            font-size: 0.94rem;
         }
-        .filters {
+
+        .hero-card ul {
+            display: grid;
+            gap: 10px;
+            color: var(--muted);
+            padding-left: 18px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 28px;
+        }
+
+        .stat {
+            padding: 18px 18px 16px;
+            border-radius: var(--radius-md);
+            background: rgba(6, 16, 28, 0.56);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 0.84rem;
+        }
+
+        .stat-value {
+            display: block;
+            margin-top: 10px;
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .toolbar {
+            position: sticky;
+            top: 18px;
+            z-index: 20;
+            margin-top: 24px;
+            padding: 18px;
+            border-radius: var(--radius-xl);
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            backdrop-filter: blur(16px);
+            box-shadow: var(--shadow);
+        }
+
+        .toolbar-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.95fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .search-panel,
+        .action-panel {
+            display: grid;
+            gap: 14px;
+        }
+
+        .panel-title {
+            font-size: 0.92rem;
+            color: var(--muted);
+            letter-spacing: 0.03em;
+        }
+
+        .search-box {
             display: flex;
-            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(6, 16, 28, 0.72);
+        }
+
+        .search-box input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: var(--text);
+            font-size: 0.98rem;
+        }
+
+        .search-box input::placeholder {
+            color: #688098;
+        }
+
+        .search-icon {
+            color: var(--accent-cool);
+            font-size: 1rem;
+        }
+
+        .action-row {
+            display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            padding: 30px 20px;
-            background: #16213e;
         }
-        .filter-btn {
-            background: transparent;
-            border: 2px solid #e94560;
-            color: #e94560;
-            padding: 8px 20px;
-            border-radius: 25px;
+
+        button,
+        select {
+            font: inherit;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 42px;
+            padding: 0 16px;
+            border-radius: 999px;
+            border: 1px solid transparent;
             cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.3s;
+            transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
         }
-        .filter-btn:hover, .filter-btn.active {
-            background: #e94560;
-            color: #fff;
+
+        .btn:hover {
+            transform: translateY(-1px);
         }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 30px 20px;
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+            color: #11202d;
+            font-weight: 700;
         }
+
+        .btn-secondary {
+            background: rgba(103, 232, 249, 0.12);
+            border-color: rgba(103, 232, 249, 0.18);
+            color: var(--accent-cool);
+        }
+
+        .btn-ghost {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+        }
+
+        .btn-danger {
+            background: rgba(255, 184, 77, 0.1);
+            border-color: rgba(255, 184, 77, 0.24);
+            color: var(--accent);
+        }
+
+        .btn:disabled {
+            opacity: 0.48;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .toolbar-note {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .filter-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text);
+            cursor: pointer;
+            transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: rgba(255, 184, 77, 0.14);
+            border-color: rgba(255, 184, 77, 0.34);
+            transform: translateY(-1px);
+        }
+
+        .filter-count {
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin: 30px 4px 18px;
+        }
+
+        .section-head h2 {
+            font-size: 1.1rem;
+        }
+
+        .section-head p {
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
         .gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
+
         .card {
-            background: #16213e;
-            border-radius: 15px;
+            display: grid;
+            grid-template-rows: 220px auto;
             overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: linear-gradient(180deg, rgba(16, 31, 47, 0.96), rgba(8, 18, 30, 0.98));
+            box-shadow: 0 18px 40px rgba(3, 11, 18, 0.32);
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
             position: relative;
         }
+
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
+            transform: translateY(-4px);
+            border-color: rgba(255, 184, 77, 0.22);
+            box-shadow: 0 24px 46px rgba(3, 11, 18, 0.4);
         }
+
         .card.selected {
-            box-shadow: 0 0 0 3px #e94560;
+            border-color: rgba(255, 184, 77, 0.58);
+            box-shadow: 0 0 0 2px rgba(255, 184, 77, 0.22), 0 24px 46px rgba(3, 11, 18, 0.4);
         }
-        .card-checkbox {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 24px;
-            height: 24px;
-            background: rgba(0,0,0,0.5);
-            border: 2px solid #e94560;
-            border-radius: 5px;
+
+        .card-thumb {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 22px;
+            background:
+                radial-gradient(circle at top, rgba(103, 232, 249, 0.16), transparent 40%),
+                linear-gradient(180deg, rgba(14, 33, 50, 0.98), rgba(11, 22, 35, 0.98));
             cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            color: #fff;
-            z-index: 10;
         }
-        .card.selected .card-checkbox {
-            display: flex;
-            background: #e94560;
-        }
-        .card-img {
-            width: 100%;
-            height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #0f3460;
-            padding: 20px;
-        }
-        .card-img img {
+
+        .card-thumb img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
             image-rendering: pixelated;
+            filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.28));
         }
-        .card-info {
-            padding: 15px;
+
+        .card-checkbox {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            width: 28px;
+            height: 28px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 184, 77, 0.46);
+            background: rgba(8, 18, 30, 0.82);
+            color: var(--accent);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
         }
-        .card-info h3 {
-            font-size: 1em;
-            color: #e94560;
-            margin-bottom: 5px;
-            word-break: break-all;
+
+        .card.selected .card-checkbox {
+            display: inline-flex;
         }
-        .card-info p {
-            font-size: 0.85em;
-            color: #666;
+
+        .card-body {
+            display: grid;
+            gap: 12px;
+            padding: 18px;
         }
-        .card-info .dimensions {
-            margin-top: 8px;
-            font-size: 0.8em;
-            color: #888;
+
+        .card-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
         }
-        .search {
-            text-align: center;
-            padding: 20px;
+
+        .card-title-row h3 {
+            font-size: 0.98rem;
+            line-height: 1.45;
+            word-break: break-word;
         }
-        .search input {
+
+        .category-badge {
+            flex-shrink: 0;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            border: 1px solid transparent;
+        }
+
+        .category-background {
+            color: #7dd3fc;
+            background: rgba(125, 211, 252, 0.12);
+            border-color: rgba(125, 211, 252, 0.2);
+        }
+
+        .category-character {
+            color: #f9a8d4;
+            background: rgba(249, 168, 212, 0.12);
+            border-color: rgba(249, 168, 212, 0.2);
+        }
+
+        .category-ui {
+            color: #fde68a;
+            background: rgba(253, 230, 138, 0.14);
+            border-color: rgba(253, 230, 138, 0.22);
+        }
+
+        .category-item {
+            color: #fdba74;
+            background: rgba(253, 186, 116, 0.12);
+            border-color: rgba(253, 186, 116, 0.2);
+        }
+
+        .category-plant {
+            color: #86efac;
+            background: rgba(134, 239, 172, 0.12);
+            border-color: rgba(134, 239, 172, 0.2);
+        }
+
+        .category-other {
+            color: #c4b5fd;
+            background: rgba(196, 181, 253, 0.12);
+            border-color: rgba(196, 181, 253, 0.2);
+        }
+
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .meta-pill {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+            font-size: 0.78rem;
+        }
+
+        .meta-pill.override {
+            color: var(--success);
+            background: rgba(134, 239, 172, 0.12);
+        }
+
+        .card-editor {
+            display: grid;
+            gap: 8px;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .card-editor label {
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        .card-editor-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .card-editor select {
             width: 100%;
-            max-width: 400px;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 25px;
-            font-size: 1em;
-            background: #0f3460;
-            color: #fff;
+            min-height: 40px;
+            padding: 0 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(6, 16, 28, 0.9);
+            color: var(--text);
             outline: none;
         }
-        .search input::placeholder {
-            color: #666;
+
+        .mini-btn {
+            min-width: 78px;
+            min-height: 40px;
+            padding: 0 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            cursor: pointer;
         }
-        footer {
+
+        .card-hint {
+            color: var(--muted);
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .empty-state {
+            padding: 46px 24px;
+            border-radius: var(--radius-lg);
+            border: 1px dashed rgba(255, 255, 255, 0.12);
             text-align: center;
-            padding: 30px;
-            color: #666;
-            border-top: 1px solid #16213e;
-            margin-top: 40px;
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .preview {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(3, 9, 16, 0.78);
+            backdrop-filter: blur(8px);
+            z-index: 40;
+        }
+
+        .preview.open {
+            display: flex;
+        }
+
+        .preview-dialog {
+            width: min(1100px, 100%);
+            max-height: 88vh;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 300px;
+            overflow: hidden;
+            border-radius: var(--radius-xl);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(8, 18, 30, 0.96);
+            box-shadow: var(--shadow);
+        }
+
+        .preview-stage {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 440px;
+            padding: 28px;
+            background:
+                linear-gradient(180deg, rgba(11, 22, 35, 0.98), rgba(7, 15, 25, 0.98));
+        }
+
+        .preview-stage img {
+            max-width: 100%;
+            max-height: 76vh;
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+
+        .preview-sidebar {
+            display: grid;
+            align-content: start;
+            gap: 14px;
+            padding: 24px;
+            border-left: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(4, 12, 20, 0.88);
+        }
+
+        .preview-sidebar h3 {
+            line-height: 1.45;
+            word-break: break-word;
+        }
+
+        .preview-sidebar p {
+            color: var(--muted);
+            line-height: 1.6;
+            font-size: 0.92rem;
+        }
+
+        .preview-close {
+            justify-self: start;
+        }
+
+        @media (max-width: 1080px) {
+            .hero-grid,
+            .toolbar-grid,
+            .preview-dialog {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-sidebar {
+                border-left: none;
+                border-top: 1px solid rgba(255, 255, 255, 0.06);
+            }
+        }
+
+        @media (max-width: 760px) {
+            .page-shell {
+                width: min(100% - 20px, 100%);
+                padding-top: 14px;
+            }
+
+            .hero,
+            .toolbar {
+                padding: 20px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .section-head {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .gallery {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>游戏美术资源</h1>
-        <p>Plant vs Zombie 风格的 Roguelike 游戏美术素材</p>
-        <div class="stats">
-            <div class="stat">资源数量: <span id="totalCount">0</span></div>
-            <div class="stat">分类: <span id="categoryCount">0</span></div>
-            <div class="stat">已选择: <span id="selectedCount">0</span></div>
+    <div class="page-shell">
+        <header class="hero">
+            <div class="hero-grid">
+                <div>
+                    <div class="eyebrow">Art Library / Browser</div>
+                    <h1>游戏美术资源</h1>
+                    <p>支持搜索、筛选、批量下载和网页端手动改分类。手动分类只保存在你当前浏览器，本地就能立刻生效。</p>
+                </div>
+                <aside class="hero-card">
+                    <h2>分类说明</h2>
+                    <p>网页会先应用自动分类规则，你也可以在每张卡片上直接改成更合适的分类。手动分类优先级最高。</p>
+                    <ul>
+                        <li>名称里带 <code>Map</code> 的资源会优先归到“背景”</li>
+                        <li>每张卡片都能单独改分类</li>
+                        <li>支持一键清空所有本地手动分类</li>
+                    </ul>
+                </aside>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-label">总资源</span>
+                    <span class="stat-value" id="totalAssetsStat">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">当前显示</span>
+                    <span class="stat-value" id="visibleAssetsStat">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">分类数量</span>
+                    <span class="stat-value" id="categoryCountStat">6</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">手动分类</span>
+                    <span class="stat-value" id="manualOverrideStat">0</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="toolbar">
+            <div class="toolbar-grid">
+                <div class="search-panel">
+                    <div class="panel-title">搜索资源</div>
+                    <div class="search-box">
+                        <span class="search-icon">⌕</span>
+                        <input type="text" id="searchInput" placeholder="输入资源名、关键词或前缀...">
+                    </div>
+                    <p class="toolbar-note">点击卡片可以预览大图；开启“选择模式”后，点击卡片会切换选中状态用于批量下载。</p>
+                </div>
+                <div class="action-panel">
+                    <div class="panel-title">操作区</div>
+                    <div class="action-row">
+                        <button class="btn btn-secondary" id="enterSelectModeBtn">选择模式</button>
+                        <button class="btn btn-ghost" id="selectAllBtn">全选当前筛选</button>
+                        <button class="btn btn-ghost" id="deselectAllBtn">取消全选</button>
+                        <button class="btn btn-primary" id="batchDownloadBtn" disabled>下载选中 (0)</button>
+                        <button class="btn btn-danger" id="resetOverridesBtn">清空手动分类</button>
+                    </div>
+                </div>
+            </div>
+            <div class="filters" id="filters"></div>
+        </section>
+
+        <div class="section-head">
+            <div>
+                <h2>资源画廊</h2>
+                <p id="sectionSummary">正在载入资源...</p>
+            </div>
         </div>
-    </header>
-    
-    <div class="batch-actions">
-        <button class="select-all-btn" id="selectAllBtn">全选</button>
-        <button class="select-all-btn" id="deselectAllBtn">取消全选</button>
-        <button id="batchDownloadBtn" disabled>下载选中 (0)</button>
-        <button id="enterSelectModeBtn">选择模式</button>
+
+        <main class="gallery" id="gallery"></main>
     </div>
-    
-    <div class="search">
-        <input type="text" id="searchInput" placeholder="搜索资源...">
+
+    <div class="preview" id="previewModal" aria-hidden="true">
+        <div class="preview-dialog">
+            <div class="preview-stage">
+                <img id="previewImage" src="" alt="">
+            </div>
+            <aside class="preview-sidebar">
+                <button class="btn btn-secondary preview-close" id="closePreviewBtn">关闭预览</button>
+                <h3 id="previewTitle"></h3>
+                <div id="previewCategory" class="category-badge category-other">其他</div>
+                <p id="previewMeta"></p>
+                <p>手动分类会保存在这个浏览器里。你可以先预览，再回到卡片里改分类。</p>
+            </aside>
+        </div>
     </div>
-    
-    <div class="filters">
-        <button class="filter-btn active" data-filter="all">全部</button>
-        <button class="filter-btn" data-filter="background">背景</button>
-        <button class="filter-btn" data-filter="character">角色</button>
-        <button class="filter-btn" data-filter="ui">UI按钮</button>
-        <button class="filter-btn" data-filter="item">道具</button>
-        <button class="filter-btn" data-filter="plant">植物</button>
-        <button class="filter-btn" data-filter="other">其他</button>
-    </div>
-    
-    <div class="container">
-        <div class="gallery" id="gallery"></div>
-    </div>
-    
-    <footer>
-        <p>Game Art Resources Gallery</p>
-    </footer>
 
     <script src="assets/exported_assets.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
-        const originalAssets = [
-            { name: 'battle_bg_dirt.png', category: 'background' },
-            { name: 'battle_bg_grass.png', category: 'background' },
-            { name: 'btn_enter_game_frames.png', category: 'ui' },
-            { name: 'btn_enter_game_v2.png', category: 'ui' },
-            { name: 'btn_enter_game.png', category: 'ui' },
-            { name: 'bullet_pea.png', category: 'item' },
-            { name: 'dave_character.png', category: 'character' },
-            { name: 'home_bg_v1.png', category: 'background' },
-            { name: 'home_bg.png', category: 'background' },
-            { name: 'icon_equipment.png', category: 'ui' },
-            { name: 'icon_gacha.png', category: 'ui' },
-            { name: 'icon_plant_upgrade.png', category: 'ui' },
-            { name: 'icon_skill_tree.png', category: 'ui' },
-            { name: 'item_exp_bean.png', category: 'item' },
-            { name: 'item_sun.png', category: 'item' },
-            { name: 'plant_peashooter.png', category: 'plant' },
-            { name: 'plant_sunshine.png', category: 'plant' },
-            { name: 'title_logo_v1.png', category: 'other' },
-            { name: 'zombie_character.png', category: 'character' }
+        const CATEGORY_OPTIONS = [
+            { key: "background", label: "背景" },
+            { key: "character", label: "角色" },
+            { key: "ui", label: "UI按钮" },
+            { key: "item", label: "道具" },
+            { key: "plant", label: "植物" },
+            { key: "other", label: "其他" }
         ];
 
-        function normalizeAsset(asset) {
-            if (asset.name.toLowerCase().includes('map')) {
-                return { ...asset, category: 'background' };
-            }
-            return asset;
-        }
+        const CATEGORY_LABELS = Object.fromEntries(CATEGORY_OPTIONS.map(option => [option.key, option.label]));
+        const MANUAL_CATEGORY_STORAGE_KEY = "art-gallery-manual-category-overrides-v2";
 
-        const assets = [...originalAssets, ...exportedAssets].map(normalizeAsset);
+        const originalAssets = [
+            { name: "battle_bg_dirt.png", category: "background" },
+            { name: "battle_bg_grass.png", category: "background" },
+            { name: "btn_enter_game_frames.png", category: "ui" },
+            { name: "btn_enter_game_v2.png", category: "ui" },
+            { name: "btn_enter_game.png", category: "ui" },
+            { name: "bullet_pea.png", category: "item" },
+            { name: "dave_character.png", category: "character" },
+            { name: "home_bg_v1.png", category: "background" },
+            { name: "home_bg.png", category: "background" },
+            { name: "icon_equipment.png", category: "ui" },
+            { name: "icon_gacha.png", category: "ui" },
+            { name: "icon_plant_upgrade.png", category: "ui" },
+            { name: "icon_skill_tree.png", category: "ui" },
+            { name: "item_exp_bean.png", category: "item" },
+            { name: "item_sun.png", category: "item" },
+            { name: "plant_peashooter.png", category: "plant" },
+            { name: "plant_sunshine.png", category: "plant" },
+            { name: "title_logo_v1.png", category: "other" },
+            { name: "zombie_character.png", category: "character" }
+        ];
 
-        let currentFilter = 'all';
-        let searchTerm = '';
+        const baseAssets = [...originalAssets, ...exportedAssets].map(asset => ({ ...asset }));
+
+        let currentFilter = "all";
+        let searchTerm = "";
         let selectMode = false;
         let selectedAssets = new Set();
+        let manualCategoryOverrides = loadManualCategoryOverrides();
 
-        const gallery = document.getElementById('gallery');
-        const searchInput = document.getElementById('searchInput');
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        
-        function updateSelectedUI() {
-            document.getElementById('selectedCount').textContent = selectedAssets.size;
-            document.getElementById('batchDownloadBtn').textContent = `下载选中 (${selectedAssets.size})`;
-            document.getElementById('batchDownloadBtn').disabled = selectedAssets.size === 0;
+        const gallery = document.getElementById("gallery");
+        const filters = document.getElementById("filters");
+        const searchInput = document.getElementById("searchInput");
+        const previewModal = document.getElementById("previewModal");
+        const previewImage = document.getElementById("previewImage");
+        const previewTitle = document.getElementById("previewTitle");
+        const previewCategory = document.getElementById("previewCategory");
+        const previewMeta = document.getElementById("previewMeta");
+
+        function escapeHtml(value) {
+            return value
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;");
         }
 
-        document.getElementById('enterSelectModeBtn').addEventListener('click', () => {
-            selectMode = !selectMode;
-            document.getElementById('enterSelectModeBtn').textContent = selectMode ? '退出选择' : '选择模式';
-            document.getElementById('enterSelectModeBtn').style.background = selectMode ? '#e94560' : 'transparent';
-            if (!selectMode) {
-                selectedAssets.clear();
-                document.querySelectorAll('.card.selected').forEach(card => {
-                    card.classList.remove('selected');
-                    card.querySelector('.card-checkbox').textContent = '';
-                });
-                updateSelectedUI();
+        function loadManualCategoryOverrides() {
+            try {
+                const raw = localStorage.getItem(MANUAL_CATEGORY_STORAGE_KEY);
+                if (!raw) return {};
+                const parsed = JSON.parse(raw);
+                return parsed && typeof parsed === "object" ? parsed : {};
+            } catch (error) {
+                console.warn("Failed to load manual category overrides:", error);
+                return {};
             }
-        });
+        }
 
-        document.getElementById('selectAllBtn').addEventListener('click', () => {
-            const visibleCards = document.querySelectorAll('.card');
-            visibleCards.forEach(card => {
-                selectedAssets.add(card.dataset.name);
-                card.classList.add('selected');
-                card.querySelector('.card-checkbox').textContent = '✓';
+        function saveManualCategoryOverrides() {
+            localStorage.setItem(MANUAL_CATEGORY_STORAGE_KEY, JSON.stringify(manualCategoryOverrides));
+        }
+
+        function getAutoCategory(asset) {
+            if (asset.name.toLowerCase().includes("map")) {
+                return "background";
+            }
+            return asset.category;
+        }
+
+        function getAssetSourceLabel(asset) {
+            return asset.name.startsWith("exported/") ? "导出资源" : "原始资源";
+        }
+
+        function getDisplayName(asset) {
+            return asset.name.replace(/^exported\//, "");
+        }
+
+        function getRenderedAssets() {
+            return baseAssets.map(asset => {
+                const autoCategory = getAutoCategory(asset);
+                const manualCategory = manualCategoryOverrides[asset.name];
+                const category = manualCategory || autoCategory;
+                return {
+                    ...asset,
+                    autoCategory,
+                    manualCategory,
+                    hasOverride: Boolean(manualCategory),
+                    category
+                };
             });
+        }
+
+        function getFilteredAssets() {
+            return getRenderedAssets().filter(asset => {
+                const matchesFilter = currentFilter === "all" || asset.category === currentFilter;
+                const matchesSearch = asset.name.toLowerCase().includes(searchTerm.toLowerCase());
+                return matchesFilter && matchesSearch;
+            });
+        }
+
+        function updateStats() {
+            const assets = getRenderedAssets();
+            const filteredAssets = getFilteredAssets();
+            document.getElementById("totalAssetsStat").textContent = assets.length;
+            document.getElementById("visibleAssetsStat").textContent = filteredAssets.length;
+            document.getElementById("manualOverrideStat").textContent = Object.keys(manualCategoryOverrides).length;
+            document.getElementById("categoryCountStat").textContent = CATEGORY_OPTIONS.length;
+            document.getElementById("sectionSummary").textContent = `当前筛选显示 ${filteredAssets.length} / ${assets.length} 个资源，手动分类会保存在本地浏览器。`;
+        }
+
+        function updateSelectedUI() {
+            document.getElementById("batchDownloadBtn").textContent = `下载选中 (${selectedAssets.size})`;
+            document.getElementById("batchDownloadBtn").disabled = selectedAssets.size === 0;
+        }
+
+        function renderFilters() {
+            const assets = getRenderedAssets();
+            const counts = assets.reduce((acc, asset) => {
+                acc[asset.category] = (acc[asset.category] || 0) + 1;
+                return acc;
+            }, {});
+
+            filters.innerHTML = [
+                `
+                    <button class="filter-btn ${currentFilter === "all" ? "active" : ""}" data-filter="all">
+                        <span>全部</span>
+                        <span class="filter-count">${assets.length}</span>
+                    </button>
+                `,
+                ...CATEGORY_OPTIONS.map(option => `
+                    <button class="filter-btn ${currentFilter === option.key ? "active" : ""}" data-filter="${option.key}">
+                        <span>${option.label}</span>
+                        <span class="filter-count">${counts[option.key] || 0}</span>
+                    </button>
+                `)
+            ].join("");
+        }
+
+        function renderGallery() {
+            const filteredAssets = getFilteredAssets();
+
+            if (filteredAssets.length === 0) {
+                gallery.innerHTML = `
+                    <div class="empty-state">
+                        <p>没有找到符合条件的资源。</p>
+                        <p>可以试试切换分类，或者清空搜索关键词。</p>
+                    </div>
+                `;
+                updateStats();
+                renderFilters();
+                return;
+            }
+
+            gallery.innerHTML = filteredAssets.map(asset => `
+                <article class="card ${selectedAssets.has(asset.name) ? "selected" : ""}" data-name="${escapeHtml(asset.name)}">
+                    <div class="card-thumb" data-action="preview">
+                        <span class="card-checkbox">${selectedAssets.has(asset.name) ? "✓" : ""}</span>
+                        <img src="assets/${encodeURI(asset.name)}" alt="${escapeHtml(getDisplayName(asset))}" loading="lazy">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <h3>${escapeHtml(getDisplayName(asset))}</h3>
+                            <span class="category-badge category-${asset.category}">${getCategoryLabel(asset.category)}</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-pill">${getAssetSourceLabel(asset)}</span>
+                            <span class="meta-pill ${asset.hasOverride ? "override" : ""}">
+                                ${asset.hasOverride ? "手动分类" : "自动分类"}
+                            </span>
+                        </div>
+                        <div class="card-editor">
+                            <label for="category-${escapeHtml(asset.name)}">手动改分类</label>
+                            <div class="card-editor-row">
+                                <select id="category-${escapeHtml(asset.name)}" data-action="set-category" data-name="${escapeHtml(asset.name)}">
+                                    <option value="">跟随自动分类（${getCategoryLabel(asset.autoCategory)}）</option>
+                                    ${CATEGORY_OPTIONS.map(option => `
+                                        <option value="${option.key}" ${asset.manualCategory === option.key ? "selected" : ""}>${option.label}</option>
+                                    `).join("")}
+                                </select>
+                                <button class="mini-btn" type="button" data-action="clear-category" data-name="${escapeHtml(asset.name)}" ${asset.hasOverride ? "" : "disabled"}>
+                                    清除
+                                </button>
+                            </div>
+                        </div>
+                        <p class="card-hint">
+                            ${selectMode ? "选择模式已开启，点击卡片缩略图可加入批量下载。" : "点击缩略图可预览大图；分类修改会即时生效。"}
+                        </p>
+                    </div>
+                </article>
+            `).join("");
+
+            updateStats();
+            renderFilters();
+        }
+
+        function getCategoryLabel(category) {
+            return CATEGORY_LABELS[category] || category;
+        }
+
+        function openPreview(assetName) {
+            const assets = getRenderedAssets();
+            const asset = assets.find(item => item.name === assetName);
+            if (!asset) return;
+
+            previewImage.src = `assets/${asset.name}`;
+            previewImage.alt = getDisplayName(asset);
+            previewTitle.textContent = getDisplayName(asset);
+            previewCategory.textContent = getCategoryLabel(asset.category);
+            previewCategory.className = `category-badge category-${asset.category}`;
+            previewMeta.textContent = `${getAssetSourceLabel(asset)} · ${asset.hasOverride ? "当前为手动分类" : "当前为自动分类"} · 自动分类：${getCategoryLabel(asset.autoCategory)}`;
+            previewModal.classList.add("open");
+            previewModal.setAttribute("aria-hidden", "false");
+        }
+
+        function closePreview() {
+            previewModal.classList.remove("open");
+            previewModal.setAttribute("aria-hidden", "true");
+            previewImage.src = "";
+        }
+
+        function setManualCategory(assetName, category) {
+            if (category) {
+                manualCategoryOverrides[assetName] = category;
+            } else {
+                delete manualCategoryOverrides[assetName];
+            }
+            saveManualCategoryOverrides();
+            renderGallery();
+            updateSelectedUI();
+        }
+
+        function toggleAssetSelection(assetName) {
+            if (selectedAssets.has(assetName)) {
+                selectedAssets.delete(assetName);
+            } else {
+                selectedAssets.add(assetName);
+            }
+            renderGallery();
+            updateSelectedUI();
+        }
+
+        document.getElementById("enterSelectModeBtn").addEventListener("click", () => {
+            selectMode = !selectMode;
+            document.getElementById("enterSelectModeBtn").textContent = selectMode ? "退出选择模式" : "选择模式";
+            renderGallery();
             updateSelectedUI();
         });
 
-        document.getElementById('deselectAllBtn').addEventListener('click', () => {
+        document.getElementById("selectAllBtn").addEventListener("click", () => {
+            getFilteredAssets().forEach(asset => selectedAssets.add(asset.name));
+            renderGallery();
+            updateSelectedUI();
+        });
+
+        document.getElementById("deselectAllBtn").addEventListener("click", () => {
             selectedAssets.clear();
-            document.querySelectorAll('.card.selected').forEach(card => {
-                card.classList.remove('selected');
-                card.querySelector('.card-checkbox').textContent = '';
-            });
+            renderGallery();
             updateSelectedUI();
         });
 
-        document.getElementById('batchDownloadBtn').addEventListener('click', async () => {
+        document.getElementById("resetOverridesBtn").addEventListener("click", () => {
+            if (Object.keys(manualCategoryOverrides).length === 0) return;
+            manualCategoryOverrides = {};
+            saveManualCategoryOverrides();
+            renderGallery();
+            updateSelectedUI();
+        });
+
+        document.getElementById("batchDownloadBtn").addEventListener("click", async () => {
             if (selectedAssets.size === 0) return;
-            
-            const btn = document.getElementById('batchDownloadBtn');
-            btn.textContent = '准备下载...';
-            btn.disabled = true;
-            
+
+            const button = document.getElementById("batchDownloadBtn");
+            button.disabled = true;
+            button.textContent = "准备下载...";
+
             try {
                 const zip = new JSZip();
-                const folder = zip.folder('art_assets');
-                
+                const folder = zip.folder("art_assets");
+                const assets = getRenderedAssets();
                 let loaded = 0;
+
                 for (const assetName of selectedAssets) {
-                    const asset = assets.find(a => a.name === assetName);
-                    if (asset) {
-                        try {
-                            const response = await fetch(`assets/${asset.name}`);
-                            const blob = await response.blob();
-                            folder.file(asset.name.replace('exported/', ''), blob);
-                            loaded++;
-                            btn.textContent = `下载中 (${loaded}/${selectedAssets.size})`;
-                        } catch (e) {
-                            console.warn(`Failed to load: ${asset.name}`);
-                        }
+                    const asset = assets.find(item => item.name === assetName);
+                    if (!asset) continue;
+
+                    try {
+                        const response = await fetch(`assets/${asset.name}`);
+                        const blob = await response.blob();
+                        folder.file(getDisplayName(asset), blob);
+                        loaded += 1;
+                        button.textContent = `下载中 (${loaded}/${selectedAssets.size})`;
+                    } catch (error) {
+                        console.warn(`Failed to load asset: ${asset.name}`, error);
                     }
                 }
-                
-                btn.textContent = '压缩中...';
-                const content = await zip.generateAsync({ type: 'blob' });
-                const link = document.createElement('a');
+
+                button.textContent = "压缩中...";
+                const content = await zip.generateAsync({ type: "blob" });
+                const link = document.createElement("a");
                 link.href = URL.createObjectURL(content);
                 link.download = `art_assets_${Date.now()}.zip`;
                 link.click();
                 URL.revokeObjectURL(link.href);
-                
-                btn.textContent = '下载完成!';
-                setTimeout(() => {
-                    btn.textContent = `下载选中 (${selectedAssets.size})`;
-                    btn.disabled = false;
-                }, 2000);
-            } catch (e) {
-                console.error('Download failed:', e);
-                btn.textContent = '下载失败';
-                btn.disabled = false;
+                button.textContent = `下载选中 (${selectedAssets.size})`;
+            } catch (error) {
+                console.error("Download failed:", error);
+                button.textContent = "下载失败";
+            } finally {
+                button.disabled = selectedAssets.size === 0;
             }
         });
 
-        function getCategoryLabel(cat) {
-            const labels = {
-                background: '背景',
-                character: '角色',
-                ui: 'UI按钮',
-                item: '道具',
-                plant: '植物',
-                other: '其他'
-            };
-            return labels[cat] || cat;
-        }
-
-        function renderGallery() {
-            const filtered = assets.filter(asset => {
-                const matchFilter = currentFilter === 'all' || asset.category === currentFilter;
-                const matchSearch = asset.name.toLowerCase().includes(searchTerm.toLowerCase());
-                return matchFilter && matchSearch;
-            });
-
-            gallery.innerHTML = filtered.map(asset => `
-                <div class="card ${selectedAssets.has(asset.name) ? 'selected' : ''}" data-name="${asset.name}">
-                    <div class="card-checkbox">${selectedAssets.has(asset.name) ? '✓' : ''}</div>
-                    <div class="card-img">
-                        <img src="assets/${asset.name}" alt="${asset.name}" loading="lazy">
-                    </div>
-                    <div class="card-info">
-                        <h3>${asset.name}</h3>
-                        <p>${getCategoryLabel(asset.category)}</p>
-                        <p class="dimensions">点击查看大图</p>
-                    </div>
-                </div>
-            `).join('');
-
-            document.getElementById('totalCount').textContent = filtered.length;
-            
-            document.querySelectorAll('.card').forEach(card => {
-                card.addEventListener('click', (e) => {
-                    if (!selectMode) return;
-                    const name = card.dataset.name;
-                    if (selectedAssets.has(name)) {
-                        selectedAssets.delete(name);
-                        card.classList.remove('selected');
-                        card.querySelector('.card-checkbox').textContent = '';
-                    } else {
-                        selectedAssets.add(name);
-                        card.classList.add('selected');
-                        card.querySelector('.card-checkbox').textContent = '✓';
-                    }
-                    updateSelectedUI();
-                });
-            });
-        }
-
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                filterBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentFilter = btn.dataset.filter;
-                renderGallery();
-            });
-        });
-
-        searchInput.addEventListener('input', (e) => {
-            searchTerm = e.target.value;
+        searchInput.addEventListener("input", event => {
+            searchTerm = event.target.value.trim();
             renderGallery();
+            updateSelectedUI();
         });
 
-        const categories = new Set(assets.map(a => a.category));
-        document.getElementById('categoryCount').textContent = categories.size;
+        filters.addEventListener("click", event => {
+            const button = event.target.closest("[data-filter]");
+            if (!button) return;
+            currentFilter = button.dataset.filter;
+            renderGallery();
+            updateSelectedUI();
+        });
+
+        gallery.addEventListener("change", event => {
+            const select = event.target.closest('[data-action="set-category"]');
+            if (!select) return;
+            setManualCategory(select.dataset.name, select.value);
+        });
+
+        gallery.addEventListener("click", event => {
+            const actionButton = event.target.closest("[data-action]");
+            if (actionButton) {
+                const assetName = actionButton.dataset.name || actionButton.closest(".card")?.dataset.name;
+                const action = actionButton.dataset.action;
+
+                if (action === "preview" && assetName) {
+                    if (selectMode) {
+                        toggleAssetSelection(assetName);
+                    } else {
+                        openPreview(assetName);
+                    }
+                    return;
+                }
+
+                if (action === "clear-category" && assetName) {
+                    setManualCategory(assetName, "");
+                }
+            }
+        });
+
+        previewModal.addEventListener("click", event => {
+            if (event.target === previewModal) {
+                closePreview();
+            }
+        });
+
+        document.getElementById("closePreviewBtn").addEventListener("click", closePreview);
+        document.addEventListener("keydown", event => {
+            if (event.key === "Escape") {
+                closePreview();
+            }
+        });
 
         renderGallery();
+        updateSelectedUI();
     </script>
 </body>
 </html>
