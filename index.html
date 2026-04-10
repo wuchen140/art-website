@@ -1036,10 +1036,7 @@
             const end = Math.min(start + itemsPerPage, allCards.length);
             const pageCards = allCards.slice(start, end);
 
-            const existingPagination = document.querySelector('.pagination-wrapper');
-            if (existingPagination) {
-                existingPagination.remove();
-            }
+            document.querySelectorAll('.pagination-wrapper').forEach(el => el.remove());
 
             gallery.innerHTML = pageCards.map(asset => createCardHTML(asset)).join('');
 
