@@ -1154,7 +1154,7 @@
 
         document.getElementById("exportDataBtn").addEventListener("click", () => {
             const data = {
-                manualCategoryOverrides: Object.fromEntries(manualCategoryOverrides),
+                manualCategoryOverrides: { ...manualCategoryOverrides },
                 deletedAssets: [...deletedAssets],
                 exportDate: new Date().toISOString()
             };
