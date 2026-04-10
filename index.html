@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rouglike-1 游戏美术资源 - 包含导出资源</title>
+    <title>游戏美术资源</title>
     <style>
         * {
             margin: 0;
@@ -212,7 +212,7 @@
 </head>
 <body>
     <header>
-        <h1>Rouglike-1 游戏美术资源</h1>
+        <h1>游戏美术资源</h1>
         <p>Plant vs Zombie 风格的 Roguelike 游戏美术素材</p>
         <div class="stats">
             <div class="stat">资源数量: <span id="totalCount">0</span></div>
@@ -240,7 +240,6 @@
         <button class="filter-btn" data-filter="item">道具</button>
         <button class="filter-btn" data-filter="plant">植物</button>
         <button class="filter-btn" data-filter="other">其他</button>
-        <button class="filter-btn" data-filter="exported">导出资源</button>
     </div>
     
     <div class="container">
@@ -248,7 +247,7 @@
     </div>
     
     <footer>
-        <p>Rouglike-1 Art Resources Gallery</p>
+        <p>Game Art Resources Gallery</p>
     </footer>
 
     <script src="assets/exported_assets.js"></script>
@@ -276,8 +275,7 @@
             { name: 'zombie_character.png', category: 'character' }
         ];
 
-        const exportedAssetList = exportedAssets.map(name => ({ name: 'exported/' + name, category: 'exported' }));
-        const assets = [...originalAssets, ...exportedAssetList];
+        const assets = [...originalAssets, ...exportedAssets];
 
         let currentFilter = 'all';
         let searchTerm = '';
@@ -381,8 +379,7 @@
                 ui: 'UI按钮',
                 item: '道具',
                 plant: '植物',
-                other: '其他',
-                exported: '导出资源'
+                other: '其他'
             };
             return labels[cat] || cat;
         }
