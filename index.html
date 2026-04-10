@@ -754,6 +754,9 @@
                         <button class="btn btn-primary" id="batchDownloadBtn" disabled>下载选中 (0)</button>
                         <button class="btn btn-danger" id="resetOverridesBtn">清空手动分类</button>
                         <button class="btn btn-ghost" id="restoreDeletedBtn">恢复已删除 (0)</button>
+                        <button class="btn btn-ghost" id="exportDataBtn">导出配置</button>
+                        <button class="btn btn-ghost" id="importDataBtn">导入配置</button>
+                        <input type="file" id="importFileInput" accept=".json" style="display:none">
                     </div>
                 </div>
             </div>
@@ -1148,6 +1151,50 @@
         function updateRestoreBtnText() {
             document.getElementById("restoreDeletedBtn").textContent = `恢复已删除 (${deletedAssets.size})`;
         }
+
+        document.getElementById("exportDataBtn").addEventListener("click", () => {
+            const data = {
+                manualCategoryOverrides: Object.fromEntries(manualCategoryOverrides),
+                deletedAssets: [...deletedAssets],
+                exportDate: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `art-gallery-config-${Date.now()}.json`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        });
+
+        document.getElementById("importDataBtn").addEventListener("click", () => {
+            document.getElementById("importFileInput").click();
+        });
+
+        document.getElementById("importFileInput").addEventListener("change", event => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.manualCategoryOverrides) {
+                        manualCategoryOverrides = data.manualCategoryOverrides;
+                        saveManualCategoryOverrides();
+                    }
+                    if (data.deletedAssets) {
+                        deletedAssets = new Set(data.deletedAssets);
+                        saveDeletedAssets();
+                    }
+                    renderGallery();
+                    updateSelectedUI();
+                    alert('导入成功！');
+                } catch (err) {
+                    alert('导入失败：' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        });
 
         document.getElementById("batchDownloadBtn").addEventListener("click", async () => {
             if (selectedAssets.size === 0) return;
