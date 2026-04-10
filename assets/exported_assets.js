@@ -525,35 +525,35 @@ const exportedAssets = [
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_01.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_02.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_03.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_04.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_05.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_06.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_07.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_08.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuoYiShengDian_01.webp",
@@ -1793,51 +1793,51 @@ const exportedAssets = [
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x17_01.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x17_02.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x17_03.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x17_04.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x25_01.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x25_02.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x25_03.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x25_04.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x33_01.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x33_02.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x33_03.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x33_04.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_SkyChengBao_13x17_01.webp",
@@ -1933,7 +1933,7 @@ const exportedAssets = [
     },
     {
         "name": "exported/2DMap_Tower_Boss_01.webp",
-        "category": "character"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_WanSheng01.webp",
@@ -6333,79 +6333,79 @@ const exportedAssets = [
     },
     {
         "name": "exported/MapRoomProps_BigStone_Green.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_BigStone_Night.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_BigStone_Red.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_BigStone.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_CastleStone_Green.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_CastleStone_Red.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_CastleStone_Yellow.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_CastleStone.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Stone_Green.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Stone_Night.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Stone_Red.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Stone_Sand.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Stone.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Wood_Green.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Wood_Night.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Wood.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_zhuzi_Blue.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_zhuzi_orange.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_zhuzi_Red.webp",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/mark.webp",
@@ -9185,7 +9185,7 @@ const exportedAssets = [
     },
     {
         "name": "exported/sactx-0-512x512-ASTC 6x6-Guild_map-643c3615.webp",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/sactx-0-512x512-ASTC 6x6-Images-29f68260.webp",
