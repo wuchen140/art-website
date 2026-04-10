@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏美术资源</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+        header {
+            background: linear-gradient(135deg, #16213e, #0f3460);
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #e94560;
+        }
+        header p {
+            color: #888;
+            font-size: 1.1em;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .stat {
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+        .stat span {
+            color: #e94560;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .batch-actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            background: #0f3460;
+        }
+        .batch-actions button {
+            background: #e94560;
+            border: none;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        .batch-actions button:hover {
+            background: #ff6b8a;
+        }
+        .batch-actions button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        .batch-actions .select-all-btn {
+            background: transparent;
+            border: 2px solid #e94560;
+        }
+        .batch-actions .select-all-btn:hover {
+            background: #e94560;
+        }
+        .selected-count {
+            color: #e94560;
+            font-weight: bold;
+        }
+        .filters {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 30px 20px;
+            background: #16213e;
+        }
+        .filter-btn {
+            background: transparent;
+            border: 2px solid #e94560;
+            color: #e94560;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: #e94560;
+            color: #fff;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        .card {
+            background: #16213e;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
+        }
+        .card.selected {
+            box-shadow: 0 0 0 3px #e94560;
+        }
+        .card-checkbox {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 24px;
+            height: 24px;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid #e94560;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #fff;
+            z-index: 10;
+        }
+        .card.selected .card-checkbox {
+            display: flex;
+            background: #e94560;
+        }
+        .card-img {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0f3460;
+            padding: 20px;
+        }
+        .card-img img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+        .card-info {
+            padding: 15px;
+        }
+        .card-info h3 {
+            font-size: 1em;
+            color: #e94560;
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+        .card-info p {
+            font-size: 0.85em;
+            color: #666;
+        }
+        .card-info .dimensions {
+            margin-top: 8px;
+            font-size: 0.8em;
+            color: #888;
+        }
+        .search {
+            text-align: center;
+            padding: 20px;
+        }
+        .search input {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            background: #0f3460;
+            color: #fff;
+            outline: none;
+        }
+        .search input::placeholder {
+            color: #666;
+        }
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            border-top: 1px solid #16213e;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>游戏美术资源</h1>
+        <p>Plant vs Zombie 风格的 Roguelike 游戏美术素材</p>
+        <div class="stats">
+            <div class="stat">资源数量: <span id="totalCount">0</span></div>
+            <div class="stat">分类: <span id="categoryCount">0</span></div>
+            <div class="stat">已选择: <span id="selectedCount">0</span></div>
+        </div>
+    </header>
+    
+    <div class="batch-actions">
+        <button class="select-all-btn" id="selectAllBtn">全选</button>
+        <button class="select-all-btn" id="deselectAllBtn">取消全选</button>
+        <button id="batchDownloadBtn" disabled>下载选中 (0)</button>
+        <button id="enterSelectModeBtn">选择模式</button>
+    </div>
+    
+    <div class="search">
+        <input type="text" id="searchInput" placeholder="搜索资源...">
+    </div>
+    
+    <div class="filters">
+        <button class="filter-btn active" data-filter="all">全部</button>
+        <button class="filter-btn" data-filter="background">背景</button>
+        <button class="filter-btn" data-filter="character">角色</button>
+        <button class="filter-btn" data-filter="ui">UI按钮</button>
+        <button class="filter-btn" data-filter="item">道具</button>
+        <button class="filter-btn" data-filter="plant">植物</button>
+        <button class="filter-btn" data-filter="other">其他</button>
+    </div>
+    
+    <div class="container">
+        <div class="gallery" id="gallery"></div>
+    </div>
+    
+    <footer>
+        <p>Game Art Resources Gallery</p>
+    </footer>
+
+    <script src="assets/exported_assets.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        const originalAssets = [
+            { name: 'battle_bg_dirt.png', category: 'background' },
+            { name: 'battle_bg_grass.png', category: 'background' },
+            { name: 'btn_enter_game_frames.png', category: 'ui' },
+            { name: 'btn_enter_game_v2.png', category: 'ui' },
+            { name: 'btn_enter_game.png', category: 'ui' },
+            { name: 'bullet_pea.png', category: 'item' },
+            { name: 'dave_character.png', category: 'character' },
+            { name: 'home_bg_v1.png', category: 'background' },
+            { name: 'home_bg.png', category: 'background' },
+            { name: 'icon_equipment.png', category: 'ui' },
+            { name: 'icon_gacha.png', category: 'ui' },
+            { name: 'icon_plant_upgrade.png', category: 'ui' },
+            { name: 'icon_skill_tree.png', category: 'ui' },
+            { name: 'item_exp_bean.png', category: 'item' },
+            { name: 'item_sun.png', category: 'item' },
+            { name: 'plant_peashooter.png', category: 'plant' },
+            { name: 'plant_sunshine.png', category: 'plant' },
+            { name: 'title_logo_v1.png', category: 'other' },
+            { name: 'zombie_character.png', category: 'character' }
+        ];
+
+        const assets = [...originalAssets, ...exportedAssets];
+
+        let currentFilter = 'all';
+        let searchTerm = '';
+        let selectMode = false;
+        let selectedAssets = new Set();
+
+        const gallery = document.getElementById('gallery');
+        const searchInput = document.getElementById('searchInput');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        
+        function updateSelectedUI() {
+            document.getElementById('selectedCount').textContent = selectedAssets.size;
+            document.getElementById('batchDownloadBtn').textContent = `下载选中 (${selectedAssets.size})`;
+            document.getElementById('batchDownloadBtn').disabled = selectedAssets.size === 0;
+        }
+
+        document.getElementById('enterSelectModeBtn').addEventListener('click', () => {
+            selectMode = !selectMode;
+            document.getElementById('enterSelectModeBtn').textContent = selectMode ? '退出选择' : '选择模式';
+            document.getElementById('enterSelectModeBtn').style.background = selectMode ? '#e94560' : 'transparent';
+            if (!selectMode) {
+                selectedAssets.clear();
+                document.querySelectorAll('.card.selected').forEach(card => {
+                    card.classList.remove('selected');
+                    card.querySelector('.card-checkbox').textContent = '';
+                });
+                updateSelectedUI();
+            }
+        });
+
+        document.getElementById('selectAllBtn').addEventListener('click', () => {
+            const visibleCards = document.querySelectorAll('.card');
+            visibleCards.forEach(card => {
+                selectedAssets.add(card.dataset.name);
+                card.classList.add('selected');
+                card.querySelector('.card-checkbox').textContent = '✓';
+            });
+            updateSelectedUI();
+        });
+
+        document.getElementById('deselectAllBtn').addEventListener('click', () => {
+            selectedAssets.clear();
+            document.querySelectorAll('.card.selected').forEach(card => {
+                card.classList.remove('selected');
+                card.querySelector('.card-checkbox').textContent = '';
+            });
+            updateSelectedUI();
+        });
+
+        document.getElementById('batchDownloadBtn').addEventListener('click', async () => {
+            if (selectedAssets.size === 0) return;
+            
+            const btn = document.getElementById('batchDownloadBtn');
+            btn.textContent = '准备下载...';
+            btn.disabled = true;
+            
+            try {
+                const zip = new JSZip();
+                const folder = zip.folder('art_assets');
+                
+                let loaded = 0;
+                for (const assetName of selectedAssets) {
+                    const asset = assets.find(a => a.name === assetName);
+                    if (asset) {
+                        try {
+                            const response = await fetch(`assets/${asset.name}`);
+                            const blob = await response.blob();
+                            folder.file(asset.name.replace('exported/', ''), blob);
+                            loaded++;
+                            btn.textContent = `下载中 (${loaded}/${selectedAssets.size})`;
+                        } catch (e) {
+                            console.warn(`Failed to load: ${asset.name}`);
+                        }
+                    }
+                }
+                
+                btn.textContent = '压缩中...';
+                const content = await zip.generateAsync({ type: 'blob' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = `art_assets_${Date.now()}.zip`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+                
+                btn.textContent = '下载完成!';
+                setTimeout(() => {
+                    btn.textContent = `下载选中 (${selectedAssets.size})`;
+                    btn.disabled = false;
+                }, 2000);
+            } catch (e) {
+                console.error('Download failed:', e);
+                btn.textContent = '下载失败';
+                btn.disabled = false;
+            }
+        });
+
+        function getCategoryLabel(cat) {
+            const labels = {
+                background: '背景',
+                character: '角色',
+                ui: 'UI按钮',
+                item: '道具',
+                plant: '植物',
+                other: '其他'
+            };
+            return labels[cat] || cat;
+        }
+
+        function renderGallery() {
+            const filtered = assets.filter(asset => {
+                const matchFilter = currentFilter === 'all' || asset.category === currentFilter;
+                const matchSearch = asset.name.toLowerCase().includes(searchTerm.toLowerCase());
+                return matchFilter && matchSearch;
+            });
+
+            gallery.innerHTML = filtered.map(asset => `
+                <div class="card ${selectedAssets.has(asset.name) ? 'selected' : ''}" data-name="${asset.name}">
+                    <div class="card-checkbox">${selectedAssets.has(asset.name) ? '✓' : ''}</div>
+                    <div class="card-img">
+                        <img src="assets/${asset.name}" alt="${asset.name}" loading="lazy">
+                    </div>
+                    <div class="card-info">
+                        <h3>${asset.name}</h3>
+                        <p>${getCategoryLabel(asset.category)}</p>
+                        <p class="dimensions">点击查看大图</p>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('totalCount').textContent = filtered.length;
+            
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    if (!selectMode) return;
+                    const name = card.dataset.name;
+                    if (selectedAssets.has(name)) {
+                        selectedAssets.delete(name);
+                        card.classList.remove('selected');
+                        card.querySelector('.card-checkbox').textContent = '';
+                    } else {
+                        selectedAssets.add(name);
+                        card.classList.add('selected');
+                        card.querySelector('.card-checkbox').textContent = '✓';
+                    }
+                    updateSelectedUI();
+                });
+            });
+        }
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderGallery();
+            });
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            renderGallery();
+        });
+
+        const categories = new Set(assets.map(a => a.category));
+        document.getElementById('categoryCount').textContent = categories.size;
+
+        renderGallery();
+    </script>
+</body>
+</html>
