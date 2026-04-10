@@ -525,35 +525,35 @@ const exportedAssets = [
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_01.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_02.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_03.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_04.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_05.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_06.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_07.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuiZhan_13x25_08.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_DuoYiShengDian_01.png",
@@ -1793,51 +1793,51 @@ const exportedAssets = [
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x17_01.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x17_02.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x17_03.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x17_04.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x25_01.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x25_02.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x25_03.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x25_04.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x33_01.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x33_02.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x33_03.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_ShuiJingGongDian_13x33_04.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_SkyChengBao_13x17_01.png",
@@ -1933,7 +1933,7 @@ const exportedAssets = [
     },
     {
         "name": "exported/2DMap_Tower_Boss_01.png",
-        "category": "character"
+        "category": "background"
     },
     {
         "name": "exported/2DMap_WanSheng01.png",
@@ -6333,79 +6333,79 @@ const exportedAssets = [
     },
     {
         "name": "exported/MapRoomProps_BigStone_Green.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_BigStone_Night.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_BigStone_Red.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_BigStone.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_CastleStone_Green.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_CastleStone_Red.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_CastleStone_Yellow.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_CastleStone.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Stone_Green.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Stone_Night.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Stone_Red.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Stone_Sand.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Stone.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Wood_Green.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Wood_Night.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_Wood.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_zhuzi_Blue.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_zhuzi_orange.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/MapRoomProps_zhuzi_Red.png",
-        "category": "item"
+        "category": "background"
     },
     {
         "name": "exported/mark.png",
@@ -9185,7 +9185,7 @@ const exportedAssets = [
     },
     {
         "name": "exported/sactx-0-512x512-ASTC 6x6-Guild_map-643c3615.png",
-        "category": "ui"
+        "category": "background"
     },
     {
         "name": "exported/sactx-0-512x512-ASTC 6x6-Images-29f68260.png",
