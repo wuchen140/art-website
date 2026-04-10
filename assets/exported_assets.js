@@ -5096,14 +5096,6 @@ const exportedAssets = [
         "category": "background"
     },
     {
-        "name": "exported/habbyid_logo_home.webp",
-        "category": "ui"
-    },
-    {
-        "name": "exported/habbyid_logo_title.webp",
-        "category": "ui"
-    },
-    {
         "name": "exported/habbyid_setting_icon_account.webp",
         "category": "ui"
     },
@@ -5158,18 +5150,6 @@ const exportedAssets = [
     {
         "name": "exported/habbyid_top_img.webp",
         "category": "other"
-    },
-    {
-        "name": "exported/habbylogo_gray_bg.webp",
-        "category": "ui"
-    },
-    {
-        "name": "exported/habbylogo_gray.webp",
-        "category": "ui"
-    },
-    {
-        "name": "exported/habbylogo@2x.webp",
-        "category": "ui"
     },
     {
         "name": "exported/HaiDao_Door.webp",
@@ -6269,14 +6249,6 @@ const exportedAssets = [
     },
     {
         "name": "exported/LOGO_TW_0.webp",
-        "category": "ui"
-    },
-    {
-        "name": "exported/LOGO_TW.webp",
-        "category": "ui"
-    },
-    {
-        "name": "exported/Logo@2x.webp",
         "category": "ui"
     },
     {
