@@ -352,9 +352,9 @@
         }
 
         .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            display: block;
+            position: relative;
+            min-height: 200px;
         }
 
         .card {
@@ -812,6 +812,13 @@
         let selectedAssets = new Set();
         let manualCategoryOverrides = loadManualCategoryOverrides();
         let deletedAssets = loadDeletedAssets();
+        let visibleRange = { start: 0, end: 50 };
+        let allCards = [];
+        let searchTimeout = null;
+
+        const CARD_HEIGHT = 340;
+        const BUFFER_SIZE = 10;
+        const INITIAL_RENDER = 50;
 
         const gallery = document.getElementById("gallery");
         const filters = document.getElementById("filters");
@@ -941,23 +948,9 @@
             ].join("");
         }
 
-        function renderGallery() {
-            const filteredAssets = getFilteredAssets();
-
-            if (filteredAssets.length === 0) {
-                gallery.innerHTML = `
-                    <div class="empty-state">
-                        <p>没有找到符合条件的资源。</p>
-                        <p>可以试试切换分类，或者清空搜索关键词。</p>
-                    </div>
-                `;
-                updateStats();
-                renderFilters();
-                return;
-            }
-
-            gallery.innerHTML = filteredAssets.map(asset => `
-                <article class="card ${selectedAssets.has(asset.name) ? "selected" : ""}" data-name="${escapeHtml(asset.name)}">
+        function createCardHTML(asset) {
+            return `
+                <article class="card ${selectedAssets.has(asset.name) ? "selected" : ""}" data-name="${escapeHtml(asset.name)}" data-index="${asset.index}">
                     <div class="card-thumb" data-action="preview">
                         <span class="card-checkbox">${selectedAssets.has(asset.name) ? "✓" : ""}</span>
                         <img src="assets/${encodeURI(asset.name)}" alt="${escapeHtml(getDisplayName(asset))}" loading="lazy">
@@ -995,10 +988,83 @@
                         </p>
                     </div>
                 </article>
-            `).join("");
+            `;
+        }
 
+        function renderGallery() {
+            const filteredAssets = getFilteredAssets().map((asset, index) => ({ ...asset, index }));
+
+            if (filteredAssets.length === 0) {
+                gallery.innerHTML = `
+                    <div class="empty-state">
+                        <p>没有找到符合条件的资源。</p>
+                        <p>可以试试切换分类，或者清空搜索关键词。</p>
+                    </div>
+                `;
+                gallery.style.height = 'auto';
+                updateStats();
+                renderFilters();
+                return;
+            }
+
+            allCards = filteredAssets;
+            const viewportHeight = window.innerHeight;
+            const cardsPerRow = Math.floor(gallery.clientWidth / 300) || 1;
+            const rowsInViewport = Math.ceil(viewportHeight / CARD_HEIGHT) + 2;
+            visibleRange.end = Math.min(INITIAL_RENDER, filteredAssets.length);
+            
+            const totalHeight = Math.ceil(filteredAssets.length / cardsPerRow) * CARD_HEIGHT;
+            gallery.style.height = totalHeight + 'px';
+            
+            renderVisibleCards();
             updateStats();
             renderFilters();
+        }
+
+        function renderVisibleCards() {
+            const cardsPerRow = Math.floor(gallery.clientWidth / 300) || 1;
+            const startRow = Math.floor(visibleRange.start / cardsPerRow);
+            const endRow = Math.ceil(visibleRange.end / cardsPerRow) + 1;
+            
+            const startIndex = Math.max(0, startRow * cardsPerRow - BUFFER_SIZE * cardsPerRow);
+            const endIndex = Math.min(allCards.length, endRow * cardsPerRow + BUFFER_SIZE * cardsPerRow);
+            
+            const visibleCards = allCards.slice(startIndex, endIndex);
+            
+            const fragment = document.createDocumentFragment();
+            
+            visibleCards.forEach(asset => {
+                const cardDiv = document.createElement('div');
+                cardDiv.style.position = 'absolute';
+                cardDiv.style.top = Math.floor(asset.index / cardsPerRow) * CARD_HEIGHT + 'px';
+                cardDiv.style.left = (asset.index % cardsPerRow) * (100 / cardsPerRow) + '%';
+                cardDiv.style.width = 100 / cardsPerRow + '%';
+                cardDiv.style.boxSizing = 'border-box';
+                cardDiv.style.padding = '10px';
+                cardDiv.innerHTML = createCardHTML(asset);
+                fragment.appendChild(cardDiv);
+            });
+            
+            gallery.innerHTML = '';
+            gallery.appendChild(fragment);
+        }
+
+        function handleScroll() {
+            const scrollTop = window.scrollY - gallery.offsetTop;
+            const viewportHeight = window.innerHeight;
+            const cardsPerRow = Math.floor(gallery.clientWidth / 300) || 1;
+            
+            const startRow = Math.max(0, Math.floor(scrollTop / CARD_HEIGHT) - BUFFER_SIZE);
+            const endRow = Math.ceil((scrollTop + viewportHeight) / CARD_HEIGHT) + BUFFER_SIZE;
+            
+            const newStart = startRow * cardsPerRow;
+            const newEnd = Math.min(allCards.length, (endRow + 1) * cardsPerRow);
+            
+            if (newStart !== visibleRange.start || newEnd !== visibleRange.end) {
+                visibleRange.start = newStart;
+                visibleRange.end = newEnd;
+                requestAnimationFrame(renderVisibleCards);
+            }
         }
 
         function getCategoryLabel(category) {
@@ -1097,25 +1163,45 @@
                 const zip = new JSZip();
                 const folder = zip.folder("art_assets");
                 const assets = getRenderedAssets();
+                const total = selectedAssets.size;
                 let loaded = 0;
 
-                for (const assetName of selectedAssets) {
+                const CONCURRENCY = 8;
+                const assetNames = [...selectedAssets];
+                
+                async function fetchWithProgress(assetName) {
                     const asset = assets.find(item => item.name === assetName);
-                    if (!asset) continue;
-
+                    if (!asset) return null;
                     try {
                         const response = await fetch(`assets/${asset.name}`);
                         const blob = await response.blob();
-                        folder.file(getDisplayName(asset), blob);
-                        loaded += 1;
-                        button.textContent = `下载中 (${loaded}/${selectedAssets.size})`;
+                        loaded++;
+                        button.textContent = `下载中 (${loaded}/${total})`;
+                        return { asset, blob };
                     } catch (error) {
                         console.warn(`Failed to load asset: ${asset.name}`, error);
+                        loaded++;
+                        button.textContent = `下载中 (${loaded}/${total})`;
+                        return null;
                     }
                 }
 
+                for (let i = 0; i < assetNames.length; i += CONCURRENCY) {
+                    const batch = assetNames.slice(i, i + CONCURRENCY);
+                    const results = await Promise.all(batch.map(fetchWithProgress));
+                    results.forEach(result => {
+                        if (result) {
+                            folder.file(getDisplayName(result.asset), result.blob);
+                        }
+                    });
+                }
+
                 button.textContent = "压缩中...";
-                const content = await zip.generateAsync({ type: "blob" });
+                const content = await zip.generateAsync({ type: "blob" }, metadata => {
+                    if (metadata.percent === 100) {
+                        button.textContent = "压缩完成";
+                    }
+                });
                 const link = document.createElement("a");
                 link.href = URL.createObjectURL(content);
                 link.download = `art_assets_${Date.now()}.zip`;
@@ -1131,9 +1217,12 @@
         });
 
         searchInput.addEventListener("input", event => {
-            searchTerm = event.target.value.trim();
-            renderGallery();
-            updateSelectedUI();
+            if (searchTimeout) clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchTerm = event.target.value.trim();
+                renderGallery();
+                updateSelectedUI();
+            }, 150);
         });
 
         filters.addEventListener("click", event => {
@@ -1194,6 +1283,21 @@
             if (event.key === "Escape") {
                 closePreview();
             }
+        });
+
+        let scrollTicking = false;
+        window.addEventListener('scroll', () => {
+            if (!scrollTicking) {
+                requestAnimationFrame(() => {
+                    handleScroll();
+                    scrollTicking = false;
+                });
+                scrollTicking = true;
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            requestAnimationFrame(renderVisibleCards);
         });
 
         renderGallery();
