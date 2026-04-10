@@ -545,6 +545,16 @@
             cursor: pointer;
         }
 
+        .btn-delete {
+            background: rgba(255, 100, 100, 0.15);
+            border-color: rgba(255, 100, 100, 0.3);
+            color: #ff8888;
+        }
+
+        .btn-delete:hover {
+            background: rgba(255, 100, 100, 0.25);
+        }
+
         .card-hint {
             color: var(--muted);
             font-size: 0.8rem;
@@ -725,6 +735,7 @@
                         <button class="btn btn-ghost" id="deselectAllBtn">取消全选</button>
                         <button class="btn btn-primary" id="batchDownloadBtn" disabled>下载选中 (0)</button>
                         <button class="btn btn-danger" id="resetOverridesBtn">清空手动分类</button>
+                        <button class="btn btn-ghost" id="restoreDeletedBtn">恢复已删除 (0)</button>
                     </div>
                 </div>
             </div>
@@ -770,6 +781,7 @@
 
         const CATEGORY_LABELS = Object.fromEntries(CATEGORY_OPTIONS.map(option => [option.key, option.label]));
         const MANUAL_CATEGORY_STORAGE_KEY = "art-gallery-manual-category-overrides-v2";
+        const DELETED_ASSETS_KEY = "art-gallery-deleted-assets-v1";
 
         const originalAssets = [
             { name: "battle_bg_dirt.png", category: "background" },
@@ -799,6 +811,7 @@
         let selectMode = false;
         let selectedAssets = new Set();
         let manualCategoryOverrides = loadManualCategoryOverrides();
+        let deletedAssets = loadDeletedAssets();
 
         const gallery = document.getElementById("gallery");
         const filters = document.getElementById("filters");
@@ -833,6 +846,22 @@
             localStorage.setItem(MANUAL_CATEGORY_STORAGE_KEY, JSON.stringify(manualCategoryOverrides));
         }
 
+        function loadDeletedAssets() {
+            try {
+                const raw = localStorage.getItem(DELETED_ASSETS_KEY);
+                if (!raw) return new Set();
+                const parsed = JSON.parse(raw);
+                return parsed && Array.isArray(parsed) ? new Set(parsed) : new Set();
+            } catch (error) {
+                console.warn("Failed to load deleted assets:", error);
+                return new Set();
+            }
+        }
+
+        function saveDeletedAssets() {
+            localStorage.setItem(DELETED_ASSETS_KEY, JSON.stringify([...deletedAssets]));
+        }
+
         function getAutoCategory(asset) {
             if (asset.name.toLowerCase().includes("map")) {
                 return "background";
@@ -849,18 +878,20 @@
         }
 
         function getRenderedAssets() {
-            return baseAssets.map(asset => {
-                const autoCategory = getAutoCategory(asset);
-                const manualCategory = manualCategoryOverrides[asset.name];
-                const category = manualCategory || autoCategory;
-                return {
-                    ...asset,
-                    autoCategory,
-                    manualCategory,
-                    hasOverride: Boolean(manualCategory),
-                    category
-                };
-            });
+            return baseAssets
+                .filter(asset => !deletedAssets.has(asset.name))
+                .map(asset => {
+                    const autoCategory = getAutoCategory(asset);
+                    const manualCategory = manualCategoryOverrides[asset.name];
+                    const category = manualCategory || autoCategory;
+                    return {
+                        ...asset,
+                        autoCategory,
+                        manualCategory,
+                        hasOverride: Boolean(manualCategory),
+                        category
+                    };
+                });
         }
 
         function getFilteredAssets() {
@@ -884,6 +915,7 @@
         function updateSelectedUI() {
             document.getElementById("batchDownloadBtn").textContent = `下载选中 (${selectedAssets.size})`;
             document.getElementById("batchDownloadBtn").disabled = selectedAssets.size === 0;
+            updateRestoreBtnText();
         }
 
         function renderFilters() {
@@ -952,6 +984,9 @@
                                 </select>
                                 <button class="mini-btn" type="button" data-action="clear-category" data-name="${escapeHtml(asset.name)}" ${asset.hasOverride ? "" : "disabled"}>
                                     清除
+                                </button>
+                                <button class="mini-btn btn-delete" type="button" data-action="delete-asset" data-name="${escapeHtml(asset.name)}">
+                                    删除
                                 </button>
                             </div>
                         </div>
@@ -1039,6 +1074,18 @@
             updateSelectedUI();
         });
 
+        document.getElementById("restoreDeletedBtn").addEventListener("click", () => {
+            if (deletedAssets.size === 0) return;
+            deletedAssets = new Set();
+            saveDeletedAssets();
+            renderGallery();
+            updateSelectedUI();
+        });
+
+        function updateRestoreBtnText() {
+            document.getElementById("restoreDeletedBtn").textContent = `恢复已删除 (${deletedAssets.size})`;
+        }
+
         document.getElementById("batchDownloadBtn").addEventListener("click", async () => {
             if (selectedAssets.size === 0) return;
 
@@ -1121,8 +1168,20 @@
                 if (action === "clear-category" && assetName) {
                     setManualCategory(assetName, "");
                 }
+
+                if (action === "delete-asset" && assetName) {
+                    deleteAsset(assetName);
+                }
             }
         });
+
+        function deleteAsset(assetName) {
+            deletedAssets.add(assetName);
+            saveDeletedAssets();
+            selectedAssets.delete(assetName);
+            renderGallery();
+            updateSelectedUI();
+        }
 
         previewModal.addEventListener("click", event => {
             if (event.target === previewModal) {
