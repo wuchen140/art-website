@@ -6220,38 +6220,6 @@ const exportedAssets = [
         "category": "other"
     },
     {
-        "name": "exported/LOGO_CN.webp",
-        "category": "ui"
-    },
-    {
-        "name": "exported/LOGO_EN_0.webp",
-        "category": "ui"
-    },
-    {
-        "name": "exported/LOGO_EN.webp",
-        "category": "ui"
-    },
-    {
-        "name": "exported/LOGO_JP_0.webp",
-        "category": "ui"
-    },
-    {
-        "name": "exported/LOGO_JP.webp",
-        "category": "ui"
-    },
-    {
-        "name": "exported/LOGO_KR_0.webp",
-        "category": "ui"
-    },
-    {
-        "name": "exported/LOGO_KR.webp",
-        "category": "ui"
-    },
-    {
-        "name": "exported/LOGO_TW_0.webp",
-        "category": "ui"
-    },
-    {
         "name": "exported/Lol.webp",
         "category": "other"
     },
