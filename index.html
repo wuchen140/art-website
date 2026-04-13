@@ -357,6 +357,72 @@
             gap: 20px;
         }
 
+        .pagination {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 18px 0;
+            padding: 14px;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: rgba(8, 18, 30, 0.72);
+        }
+
+        .pagination:empty {
+            display: none;
+        }
+
+        .page-btn {
+            min-width: 42px;
+            min-height: 38px;
+            padding: 0 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            cursor: pointer;
+            transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+        }
+
+        .page-btn:hover:not(:disabled),
+        .page-btn.active {
+            transform: translateY(-1px);
+            background: rgba(255, 184, 77, 0.14);
+            border-color: rgba(255, 184, 77, 0.34);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .page-jump {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .page-jump input {
+            width: 76px;
+            min-height: 38px;
+            padding: 0 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(6, 16, 28, 0.88);
+            color: var(--text);
+            outline: none;
+            text-align: center;
+        }
+
         .card {
             display: grid;
             grid-template-rows: 220px auto;
@@ -721,7 +787,7 @@
                     <div class="panel-title">操作区</div>
                     <div class="action-row">
                         <button class="btn btn-secondary" id="enterSelectModeBtn">选择模式</button>
-                        <button class="btn btn-ghost" id="selectAllBtn">全选当前筛选</button>
+                        <button class="btn btn-ghost" id="selectAllBtn">全选当前页</button>
                         <button class="btn btn-ghost" id="deselectAllBtn">取消全选</button>
                         <button class="btn btn-primary" id="batchDownloadBtn" disabled>下载选中 (0)</button>
                         <button class="btn btn-danger" id="resetOverridesBtn">清空手动分类</button>
@@ -738,7 +804,9 @@
             </div>
         </div>
 
+        <nav class="pagination" id="paginationTop" aria-label="分页"></nav>
         <main class="gallery" id="gallery"></main>
+        <nav class="pagination" id="paginationBottom" aria-label="分页"></nav>
     </div>
 
     <div class="preview" id="previewModal" aria-hidden="true">
@@ -770,6 +838,7 @@
 
         const CATEGORY_LABELS = Object.fromEntries(CATEGORY_OPTIONS.map(option => [option.key, option.label]));
         const MANUAL_CATEGORY_STORAGE_KEY = "art-gallery-manual-category-overrides-v2";
+        const ITEMS_PER_PAGE = 72;
 
         const originalAssets = [
             { name: "battle_bg_dirt.png", category: "background" },
@@ -798,11 +867,14 @@
         let currentFilter = "all";
         let searchTerm = "";
         let selectMode = false;
+        let currentPage = 1;
         let selectedAssets = new Set();
         let manualCategoryOverrides = loadManualCategoryOverrides();
 
         const gallery = document.getElementById("gallery");
         const filters = document.getElementById("filters");
+        const paginationTop = document.getElementById("paginationTop");
+        const paginationBottom = document.getElementById("paginationBottom");
         const searchInput = document.getElementById("searchInput");
         const previewModal = document.getElementById("previewModal");
         const previewImage = document.getElementById("previewImage");
@@ -872,14 +944,30 @@
             });
         }
 
+        function getTotalPages(totalItems) {
+            return Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
+        }
+
+        function clampCurrentPage(totalItems) {
+            const totalPages = getTotalPages(totalItems);
+            currentPage = Math.min(Math.max(currentPage, 1), totalPages);
+            return totalPages;
+        }
+
+        function getCurrentPageAssets(filteredAssets) {
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            return filteredAssets.slice(start, start + ITEMS_PER_PAGE);
+        }
+
         function updateStats() {
             const assets = getRenderedAssets();
             const filteredAssets = getFilteredAssets();
+            const totalPages = getTotalPages(filteredAssets.length);
             document.getElementById("totalAssetsStat").textContent = assets.length;
             document.getElementById("visibleAssetsStat").textContent = filteredAssets.length;
             document.getElementById("manualOverrideStat").textContent = Object.keys(manualCategoryOverrides).length;
             document.getElementById("categoryCountStat").textContent = CATEGORY_OPTIONS.length;
-            document.getElementById("sectionSummary").textContent = `当前筛选显示 ${filteredAssets.length} / ${assets.length} 个资源，手动分类会保存在本地浏览器。`;
+            document.getElementById("sectionSummary").textContent = `当前筛选显示 ${filteredAssets.length} / ${assets.length} 个资源，第 ${currentPage} / ${totalPages} 页，每页 ${ITEMS_PER_PAGE} 个。`;
         }
 
         function updateSelectedUI() {
@@ -910,8 +998,69 @@
             ].join("");
         }
 
+        function getVisiblePageNumbers(totalPages) {
+            const pages = new Set([1, totalPages, currentPage]);
+            for (let offset = -2; offset <= 2; offset += 1) {
+                const page = currentPage + offset;
+                if (page >= 1 && page <= totalPages) {
+                    pages.add(page);
+                }
+            }
+            return [...pages].sort((a, b) => a - b);
+        }
+
+        function renderPagination(filteredAssets) {
+            const totalPages = clampCurrentPage(filteredAssets.length);
+            const pageNumbers = getVisiblePageNumbers(totalPages);
+            const firstItem = filteredAssets.length === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1;
+            const lastItem = Math.min(currentPage * ITEMS_PER_PAGE, filteredAssets.length);
+
+            const pageButtons = [];
+            let previousPage = 0;
+            for (const page of pageNumbers) {
+                if (previousPage && page - previousPage > 1) {
+                    pageButtons.push(`<span class="page-info">...</span>`);
+                }
+                pageButtons.push(`
+                    <button class="page-btn ${page === currentPage ? "active" : ""}" data-page="${page}" ${page === currentPage ? "disabled" : ""}>
+                        ${page}
+                    </button>
+                `);
+                previousPage = page;
+            }
+
+            const markup = `
+                <button class="page-btn" data-page="1" ${currentPage === 1 ? "disabled" : ""}>首页</button>
+                <button class="page-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? "disabled" : ""}>上一页</button>
+                ${pageButtons.join("")}
+                <button class="page-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? "disabled" : ""}>下一页</button>
+                <button class="page-btn" data-page="${totalPages}" ${currentPage === totalPages ? "disabled" : ""}>末页</button>
+                <span class="page-info">${firstItem}-${lastItem} / ${filteredAssets.length}</span>
+                <label class="page-jump">
+                    跳到
+                    <input type="number" min="1" max="${totalPages}" value="${currentPage}" data-page-jump>
+                    页
+                </label>
+            `;
+
+            paginationTop.innerHTML = markup;
+            paginationBottom.innerHTML = markup;
+        }
+
+        function setCurrentPage(page, shouldScroll = true) {
+            const totalPages = getTotalPages(getFilteredAssets().length);
+            currentPage = Math.min(Math.max(Number(page) || 1, 1), totalPages);
+            renderGallery();
+            updateSelectedUI();
+            if (shouldScroll) {
+                document.querySelector(".section-head").scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        }
+
         function renderGallery() {
             const filteredAssets = getFilteredAssets();
+            clampCurrentPage(filteredAssets.length);
+            const pageAssets = getCurrentPageAssets(filteredAssets);
 
             if (filteredAssets.length === 0) {
                 gallery.innerHTML = `
@@ -920,12 +1069,13 @@
                         <p>可以试试切换分类，或者清空搜索关键词。</p>
                     </div>
                 `;
+                renderPagination(filteredAssets);
                 updateStats();
                 renderFilters();
                 return;
             }
 
-            gallery.innerHTML = filteredAssets.map(asset => `
+            gallery.innerHTML = pageAssets.map(asset => `
                 <article class="card ${selectedAssets.has(asset.name) ? "selected" : ""}" data-name="${escapeHtml(asset.name)}">
                     <div class="card-thumb" data-action="preview">
                         <span class="card-checkbox">${selectedAssets.has(asset.name) ? "✓" : ""}</span>
@@ -963,6 +1113,7 @@
                 </article>
             `).join("");
 
+            renderPagination(filteredAssets);
             updateStats();
             renderFilters();
         }
@@ -999,6 +1150,7 @@
                 delete manualCategoryOverrides[assetName];
             }
             saveManualCategoryOverrides();
+            currentPage = Math.min(currentPage, getTotalPages(getFilteredAssets().length));
             renderGallery();
             updateSelectedUI();
         }
@@ -1009,7 +1161,14 @@
             } else {
                 selectedAssets.add(assetName);
             }
-            renderGallery();
+            const card = [...gallery.querySelectorAll(".card")].find(item => item.dataset.name === assetName);
+            if (card) {
+                card.classList.toggle("selected", selectedAssets.has(assetName));
+                const checkbox = card.querySelector(".card-checkbox");
+                if (checkbox) {
+                    checkbox.textContent = selectedAssets.has(assetName) ? "✓" : "";
+                }
+            }
             updateSelectedUI();
         }
 
@@ -1021,7 +1180,7 @@
         });
 
         document.getElementById("selectAllBtn").addEventListener("click", () => {
-            getFilteredAssets().forEach(asset => selectedAssets.add(asset.name));
+            getCurrentPageAssets(getFilteredAssets()).forEach(asset => selectedAssets.add(asset.name));
             renderGallery();
             updateSelectedUI();
         });
@@ -1086,6 +1245,7 @@
 
         searchInput.addEventListener("input", event => {
             searchTerm = event.target.value.trim();
+            currentPage = 1;
             renderGallery();
             updateSelectedUI();
         });
@@ -1094,9 +1254,28 @@
             const button = event.target.closest("[data-filter]");
             if (!button) return;
             currentFilter = button.dataset.filter;
+            currentPage = 1;
             renderGallery();
             updateSelectedUI();
         });
+
+        function handlePaginationEvent(event) {
+            const pageButton = event.target.closest("[data-page]");
+            if (pageButton) {
+                setCurrentPage(pageButton.dataset.page);
+                return;
+            }
+
+            const pageJump = event.target.closest("[data-page-jump]");
+            if (pageJump && event.type === "change") {
+                setCurrentPage(pageJump.value);
+            }
+        }
+
+        paginationTop.addEventListener("click", handlePaginationEvent);
+        paginationBottom.addEventListener("click", handlePaginationEvent);
+        paginationTop.addEventListener("change", handlePaginationEvent);
+        paginationBottom.addEventListener("change", handlePaginationEvent);
 
         gallery.addEventListener("change", event => {
             const select = event.target.closest('[data-action="set-category"]');
