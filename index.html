@@ -357,22 +357,70 @@
             gap: 20px;
         }
 
-        .pagination-wrapper {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: center;
-            padding: 24px 0;
-        }
-
         .pagination {
             display: flex;
-            gap: 10px;
+            flex-wrap: wrap;
             align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 18px 0;
+            padding: 14px;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: rgba(8, 18, 30, 0.72);
+        }
+
+        .pagination:empty {
+            display: none;
+        }
+
+        .page-btn {
+            min-width: 42px;
+            min-height: 38px;
+            padding: 0 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            cursor: pointer;
+            transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+        }
+
+        .page-btn:hover:not(:disabled),
+        .page-btn.active {
+            transform: translateY(-1px);
+            background: rgba(255, 184, 77, 0.14);
+            border-color: rgba(255, 184, 77, 0.34);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
         }
 
         .page-info {
             color: var(--muted);
-            padding: 0 16px;
+            font-size: 0.9rem;
+        }
+
+        .page-jump {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .page-jump input {
+            width: 76px;
+            min-height: 38px;
+            padding: 0 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(6, 16, 28, 0.88);
+            color: var(--text);
+            outline: none;
+            text-align: center;
         }
 
         .card {
@@ -563,16 +611,6 @@
             cursor: pointer;
         }
 
-        .btn-delete {
-            background: rgba(255, 100, 100, 0.15);
-            border-color: rgba(255, 100, 100, 0.3);
-            color: #ff8888;
-        }
-
-        .btn-delete:hover {
-            background: rgba(255, 100, 100, 0.25);
-        }
-
         .card-hint {
             color: var(--muted);
             font-size: 0.8rem;
@@ -749,14 +787,10 @@
                     <div class="panel-title">操作区</div>
                     <div class="action-row">
                         <button class="btn btn-secondary" id="enterSelectModeBtn">选择模式</button>
-                        <button class="btn btn-ghost" id="selectAllBtn">全选当前筛选</button>
+                        <button class="btn btn-ghost" id="selectAllBtn">全选当前页</button>
                         <button class="btn btn-ghost" id="deselectAllBtn">取消全选</button>
                         <button class="btn btn-primary" id="batchDownloadBtn" disabled>下载选中 (0)</button>
                         <button class="btn btn-danger" id="resetOverridesBtn">清空手动分类</button>
-                        <button class="btn btn-ghost" id="restoreDeletedBtn">恢复已删除 (0)</button>
-                        <button class="btn btn-ghost" id="exportDataBtn">导出配置</button>
-                        <button class="btn btn-ghost" id="importDataBtn">导入配置</button>
-                        <input type="file" id="importFileInput" accept=".json" style="display:none">
                     </div>
                 </div>
             </div>
@@ -770,7 +804,9 @@
             </div>
         </div>
 
+        <nav class="pagination" id="paginationTop" aria-label="分页"></nav>
         <main class="gallery" id="gallery"></main>
+        <nav class="pagination" id="paginationBottom" aria-label="分页"></nav>
     </div>
 
     <div class="preview" id="previewModal" aria-hidden="true">
@@ -802,7 +838,7 @@
 
         const CATEGORY_LABELS = Object.fromEntries(CATEGORY_OPTIONS.map(option => [option.key, option.label]));
         const MANUAL_CATEGORY_STORAGE_KEY = "art-gallery-manual-category-overrides-v2";
-        const DELETED_ASSETS_KEY = "art-gallery-deleted-assets-v1";
+        const ITEMS_PER_PAGE = 72;
 
         const originalAssets = [
             { name: "battle_bg_dirt.png", category: "background" },
@@ -822,6 +858,7 @@
             { name: "item_sun.png", category: "item" },
             { name: "plant_peashooter.png", category: "plant" },
             { name: "plant_sunshine.png", category: "plant" },
+            { name: "title_logo_v1.png", category: "other" },
             { name: "zombie_character.png", category: "character" }
         ];
 
@@ -830,16 +867,14 @@
         let currentFilter = "all";
         let searchTerm = "";
         let selectMode = false;
+        let currentPage = 1;
         let selectedAssets = new Set();
         let manualCategoryOverrides = loadManualCategoryOverrides();
-        let deletedAssets = loadDeletedAssets();
-        let allCards = [];
-        let searchTimeout = null;
-        let currentPage = 1;
-        const itemsPerPage = 40;
 
         const gallery = document.getElementById("gallery");
         const filters = document.getElementById("filters");
+        const paginationTop = document.getElementById("paginationTop");
+        const paginationBottom = document.getElementById("paginationBottom");
         const searchInput = document.getElementById("searchInput");
         const previewModal = document.getElementById("previewModal");
         const previewImage = document.getElementById("previewImage");
@@ -871,22 +906,6 @@
             localStorage.setItem(MANUAL_CATEGORY_STORAGE_KEY, JSON.stringify(manualCategoryOverrides));
         }
 
-        function loadDeletedAssets() {
-            try {
-                const raw = localStorage.getItem(DELETED_ASSETS_KEY);
-                if (!raw) return new Set();
-                const parsed = JSON.parse(raw);
-                return parsed && Array.isArray(parsed) ? new Set(parsed) : new Set();
-            } catch (error) {
-                console.warn("Failed to load deleted assets:", error);
-                return new Set();
-            }
-        }
-
-        function saveDeletedAssets() {
-            localStorage.setItem(DELETED_ASSETS_KEY, JSON.stringify([...deletedAssets]));
-        }
-
         function getAutoCategory(asset) {
             if (asset.name.toLowerCase().includes("map")) {
                 return "background";
@@ -903,20 +922,18 @@
         }
 
         function getRenderedAssets() {
-            return baseAssets
-                .filter(asset => !deletedAssets.has(asset.name))
-                .map(asset => {
-                    const autoCategory = getAutoCategory(asset);
-                    const manualCategory = manualCategoryOverrides[asset.name];
-                    const category = manualCategory || autoCategory;
-                    return {
-                        ...asset,
-                        autoCategory,
-                        manualCategory,
-                        hasOverride: Boolean(manualCategory),
-                        category
-                    };
-                });
+            return baseAssets.map(asset => {
+                const autoCategory = getAutoCategory(asset);
+                const manualCategory = manualCategoryOverrides[asset.name];
+                const category = manualCategory || autoCategory;
+                return {
+                    ...asset,
+                    autoCategory,
+                    manualCategory,
+                    hasOverride: Boolean(manualCategory),
+                    category
+                };
+            });
         }
 
         function getFilteredAssets() {
@@ -927,20 +944,35 @@
             });
         }
 
+        function getTotalPages(totalItems) {
+            return Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
+        }
+
+        function clampCurrentPage(totalItems) {
+            const totalPages = getTotalPages(totalItems);
+            currentPage = Math.min(Math.max(currentPage, 1), totalPages);
+            return totalPages;
+        }
+
+        function getCurrentPageAssets(filteredAssets) {
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            return filteredAssets.slice(start, start + ITEMS_PER_PAGE);
+        }
+
         function updateStats() {
             const assets = getRenderedAssets();
             const filteredAssets = getFilteredAssets();
+            const totalPages = getTotalPages(filteredAssets.length);
             document.getElementById("totalAssetsStat").textContent = assets.length;
             document.getElementById("visibleAssetsStat").textContent = filteredAssets.length;
             document.getElementById("manualOverrideStat").textContent = Object.keys(manualCategoryOverrides).length;
             document.getElementById("categoryCountStat").textContent = CATEGORY_OPTIONS.length;
-            document.getElementById("sectionSummary").textContent = `当前筛选显示 ${filteredAssets.length} / ${assets.length} 个资源，手动分类会保存在本地浏览器。`;
+            document.getElementById("sectionSummary").textContent = `当前筛选显示 ${filteredAssets.length} / ${assets.length} 个资源，第 ${currentPage} / ${totalPages} 页，每页 ${ITEMS_PER_PAGE} 个。`;
         }
 
         function updateSelectedUI() {
             document.getElementById("batchDownloadBtn").textContent = `下载选中 (${selectedAssets.size})`;
             document.getElementById("batchDownloadBtn").disabled = selectedAssets.size === 0;
-            updateRestoreBtnText();
         }
 
         function renderFilters() {
@@ -966,9 +998,85 @@
             ].join("");
         }
 
-        function createCardHTML(asset) {
-            return `
-                <article class="card ${selectedAssets.has(asset.name) ? "selected" : ""}" data-name="${escapeHtml(asset.name)}" data-index="${asset.index}">
+        function getVisiblePageNumbers(totalPages) {
+            const pages = new Set([1, totalPages, currentPage]);
+            for (let offset = -2; offset <= 2; offset += 1) {
+                const page = currentPage + offset;
+                if (page >= 1 && page <= totalPages) {
+                    pages.add(page);
+                }
+            }
+            return [...pages].sort((a, b) => a - b);
+        }
+
+        function renderPagination(filteredAssets) {
+            const totalPages = clampCurrentPage(filteredAssets.length);
+            const pageNumbers = getVisiblePageNumbers(totalPages);
+            const firstItem = filteredAssets.length === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1;
+            const lastItem = Math.min(currentPage * ITEMS_PER_PAGE, filteredAssets.length);
+
+            const pageButtons = [];
+            let previousPage = 0;
+            for (const page of pageNumbers) {
+                if (previousPage && page - previousPage > 1) {
+                    pageButtons.push(`<span class="page-info">...</span>`);
+                }
+                pageButtons.push(`
+                    <button class="page-btn ${page === currentPage ? "active" : ""}" data-page="${page}" ${page === currentPage ? "disabled" : ""}>
+                        ${page}
+                    </button>
+                `);
+                previousPage = page;
+            }
+
+            const markup = `
+                <button class="page-btn" data-page="1" ${currentPage === 1 ? "disabled" : ""}>首页</button>
+                <button class="page-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? "disabled" : ""}>上一页</button>
+                ${pageButtons.join("")}
+                <button class="page-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? "disabled" : ""}>下一页</button>
+                <button class="page-btn" data-page="${totalPages}" ${currentPage === totalPages ? "disabled" : ""}>末页</button>
+                <span class="page-info">${firstItem}-${lastItem} / ${filteredAssets.length}</span>
+                <label class="page-jump">
+                    跳到
+                    <input type="number" min="1" max="${totalPages}" value="${currentPage}" data-page-jump>
+                    页
+                </label>
+            `;
+
+            paginationTop.innerHTML = markup;
+            paginationBottom.innerHTML = markup;
+        }
+
+        function setCurrentPage(page, shouldScroll = true) {
+            const totalPages = getTotalPages(getFilteredAssets().length);
+            currentPage = Math.min(Math.max(Number(page) || 1, 1), totalPages);
+            renderGallery();
+            updateSelectedUI();
+            if (shouldScroll) {
+                document.querySelector(".section-head").scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        }
+
+        function renderGallery() {
+            const filteredAssets = getFilteredAssets();
+            clampCurrentPage(filteredAssets.length);
+            const pageAssets = getCurrentPageAssets(filteredAssets);
+
+            if (filteredAssets.length === 0) {
+                gallery.innerHTML = `
+                    <div class="empty-state">
+                        <p>没有找到符合条件的资源。</p>
+                        <p>可以试试切换分类，或者清空搜索关键词。</p>
+                    </div>
+                `;
+                renderPagination(filteredAssets);
+                updateStats();
+                renderFilters();
+                return;
+            }
+
+            gallery.innerHTML = pageAssets.map(asset => `
+                <article class="card ${selectedAssets.has(asset.name) ? "selected" : ""}" data-name="${escapeHtml(asset.name)}">
                     <div class="card-thumb" data-action="preview">
                         <span class="card-checkbox">${selectedAssets.has(asset.name) ? "✓" : ""}</span>
                         <img src="assets/${encodeURI(asset.name)}" alt="${escapeHtml(getDisplayName(asset))}" loading="lazy">
@@ -996,9 +1104,6 @@
                                 <button class="mini-btn" type="button" data-action="clear-category" data-name="${escapeHtml(asset.name)}" ${asset.hasOverride ? "" : "disabled"}>
                                     清除
                                 </button>
-                                <button class="mini-btn btn-delete" type="button" data-action="delete-asset" data-name="${escapeHtml(asset.name)}">
-                                    删除
-                                </button>
                             </div>
                         </div>
                         <p class="card-hint">
@@ -1006,65 +1111,11 @@
                         </p>
                     </div>
                 </article>
-            `;
-        }
+            `).join("");
 
-        function renderGallery() {
-            const filteredAssets = getFilteredAssets();
-
-            if (filteredAssets.length === 0) {
-                gallery.innerHTML = `
-                    <div class="empty-state">
-                        <p>没有找到符合条件的资源。</p>
-                        <p>可以试试切换分类，或者清空搜索关键词。</p>
-                    </div>
-                `;
-                gallery.style.height = 'auto';
-                updateStats();
-                renderFilters();
-                return;
-            }
-
-            allCards = filteredAssets;
-            currentPage = 1;
-            
-            renderPage();
+            renderPagination(filteredAssets);
             updateStats();
             renderFilters();
-        }
-
-        function renderPage() {
-            const totalPages = Math.ceil(allCards.length / itemsPerPage);
-            const start = (currentPage - 1) * itemsPerPage;
-            const end = Math.min(start + itemsPerPage, allCards.length);
-            const pageCards = allCards.slice(start, end);
-
-            document.querySelectorAll('.pagination-wrapper').forEach(el => el.remove());
-
-            gallery.innerHTML = pageCards.map(asset => createCardHTML(asset)).join('');
-
-            if (totalPages > 1) {
-                const paginationHTML = `
-                    <div class="pagination">
-                        <button class="btn btn-ghost" onclick="goToPage(1)" ${currentPage === 1 ? 'disabled' : ''}>首页</button>
-                        <button class="btn btn-ghost" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>
-                        <span class="page-info">第 ${currentPage} / ${totalPages} 页</span>
-                        <button class="btn btn-ghost" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>
-                        <button class="btn btn-ghost" onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>末页</button>
-                    </div>
-                `;
-                gallery.insertAdjacentHTML('afterend', `
-                    <div class="pagination-wrapper">${paginationHTML}</div>
-                `);
-            }
-        }
-
-        function goToPage(page) {
-            const totalPages = Math.ceil(allCards.length / itemsPerPage);
-            if (page < 1 || page > totalPages) return;
-            currentPage = page;
-            renderPage();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function getCategoryLabel(category) {
@@ -1099,6 +1150,7 @@
                 delete manualCategoryOverrides[assetName];
             }
             saveManualCategoryOverrides();
+            currentPage = Math.min(currentPage, getTotalPages(getFilteredAssets().length));
             renderGallery();
             updateSelectedUI();
         }
@@ -1109,7 +1161,14 @@
             } else {
                 selectedAssets.add(assetName);
             }
-            renderGallery();
+            const card = [...gallery.querySelectorAll(".card")].find(item => item.dataset.name === assetName);
+            if (card) {
+                card.classList.toggle("selected", selectedAssets.has(assetName));
+                const checkbox = card.querySelector(".card-checkbox");
+                if (checkbox) {
+                    checkbox.textContent = selectedAssets.has(assetName) ? "✓" : "";
+                }
+            }
             updateSelectedUI();
         }
 
@@ -1121,7 +1180,7 @@
         });
 
         document.getElementById("selectAllBtn").addEventListener("click", () => {
-            getFilteredAssets().forEach(asset => selectedAssets.add(asset.name));
+            getCurrentPageAssets(getFilteredAssets()).forEach(asset => selectedAssets.add(asset.name));
             renderGallery();
             updateSelectedUI();
         });
@@ -1140,62 +1199,6 @@
             updateSelectedUI();
         });
 
-        document.getElementById("restoreDeletedBtn").addEventListener("click", () => {
-            if (deletedAssets.size === 0) return;
-            deletedAssets = new Set();
-            saveDeletedAssets();
-            renderGallery();
-            updateSelectedUI();
-        });
-
-        function updateRestoreBtnText() {
-            document.getElementById("restoreDeletedBtn").textContent = `恢复已删除 (${deletedAssets.size})`;
-        }
-
-        document.getElementById("exportDataBtn").addEventListener("click", () => {
-            const data = {
-                manualCategoryOverrides: { ...manualCategoryOverrides },
-                deletedAssets: [...deletedAssets],
-                exportDate: new Date().toISOString()
-            };
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `art-gallery-config-${Date.now()}.json`;
-            link.click();
-            URL.revokeObjectURL(link.href);
-        });
-
-        document.getElementById("importDataBtn").addEventListener("click", () => {
-            document.getElementById("importFileInput").click();
-        });
-
-        document.getElementById("importFileInput").addEventListener("change", event => {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = e => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (data.manualCategoryOverrides) {
-                        manualCategoryOverrides = data.manualCategoryOverrides;
-                        saveManualCategoryOverrides();
-                    }
-                    if (data.deletedAssets) {
-                        deletedAssets = new Set(data.deletedAssets);
-                        saveDeletedAssets();
-                    }
-                    renderGallery();
-                    updateSelectedUI();
-                    alert('导入成功！');
-                } catch (err) {
-                    alert('导入失败：' + err.message);
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = '';
-        });
-
         document.getElementById("batchDownloadBtn").addEventListener("click", async () => {
             if (selectedAssets.size === 0) return;
 
@@ -1207,45 +1210,25 @@
                 const zip = new JSZip();
                 const folder = zip.folder("art_assets");
                 const assets = getRenderedAssets();
-                const total = selectedAssets.size;
                 let loaded = 0;
 
-                const CONCURRENCY = 8;
-                const assetNames = [...selectedAssets];
-                
-                async function fetchWithProgress(assetName) {
+                for (const assetName of selectedAssets) {
                     const asset = assets.find(item => item.name === assetName);
-                    if (!asset) return null;
+                    if (!asset) continue;
+
                     try {
                         const response = await fetch(`assets/${asset.name}`);
                         const blob = await response.blob();
-                        loaded++;
-                        button.textContent = `下载中 (${loaded}/${total})`;
-                        return { asset, blob };
+                        folder.file(getDisplayName(asset), blob);
+                        loaded += 1;
+                        button.textContent = `下载中 (${loaded}/${selectedAssets.size})`;
                     } catch (error) {
                         console.warn(`Failed to load asset: ${asset.name}`, error);
-                        loaded++;
-                        button.textContent = `下载中 (${loaded}/${total})`;
-                        return null;
                     }
-                }
-
-                for (let i = 0; i < assetNames.length; i += CONCURRENCY) {
-                    const batch = assetNames.slice(i, i + CONCURRENCY);
-                    const results = await Promise.all(batch.map(fetchWithProgress));
-                    results.forEach(result => {
-                        if (result) {
-                            folder.file(getDisplayName(result.asset), result.blob);
-                        }
-                    });
                 }
 
                 button.textContent = "压缩中...";
-                const content = await zip.generateAsync({ type: "blob" }, metadata => {
-                    if (metadata.percent === 100) {
-                        button.textContent = "压缩完成";
-                    }
-                });
+                const content = await zip.generateAsync({ type: "blob" });
                 const link = document.createElement("a");
                 link.href = URL.createObjectURL(content);
                 link.download = `art_assets_${Date.now()}.zip`;
@@ -1261,21 +1244,38 @@
         });
 
         searchInput.addEventListener("input", event => {
-            if (searchTimeout) clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                searchTerm = event.target.value.trim();
-                renderGallery();
-                updateSelectedUI();
-            }, 150);
+            searchTerm = event.target.value.trim();
+            currentPage = 1;
+            renderGallery();
+            updateSelectedUI();
         });
 
         filters.addEventListener("click", event => {
             const button = event.target.closest("[data-filter]");
             if (!button) return;
             currentFilter = button.dataset.filter;
+            currentPage = 1;
             renderGallery();
             updateSelectedUI();
         });
+
+        function handlePaginationEvent(event) {
+            const pageButton = event.target.closest("[data-page]");
+            if (pageButton) {
+                setCurrentPage(pageButton.dataset.page);
+                return;
+            }
+
+            const pageJump = event.target.closest("[data-page-jump]");
+            if (pageJump && event.type === "change") {
+                setCurrentPage(pageJump.value);
+            }
+        }
+
+        paginationTop.addEventListener("click", handlePaginationEvent);
+        paginationBottom.addEventListener("click", handlePaginationEvent);
+        paginationTop.addEventListener("change", handlePaginationEvent);
+        paginationBottom.addEventListener("change", handlePaginationEvent);
 
         gallery.addEventListener("change", event => {
             const select = event.target.closest('[data-action="set-category"]');
@@ -1301,20 +1301,8 @@
                 if (action === "clear-category" && assetName) {
                     setManualCategory(assetName, "");
                 }
-
-                if (action === "delete-asset" && assetName) {
-                    deleteAsset(assetName);
-                }
             }
         });
-
-        function deleteAsset(assetName) {
-            deletedAssets.add(assetName);
-            saveDeletedAssets();
-            selectedAssets.delete(assetName);
-            renderGallery();
-            updateSelectedUI();
-        }
 
         previewModal.addEventListener("click", event => {
             if (event.target === previewModal) {
